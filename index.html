@@ -1,0 +1,2645 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Interactive Video Mockup 9:16 — Thời Trang & Hành Vi Mua Ngẫu Hứng Gen Z</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Be Vietnam Pro & Playfair Display -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --font-sans: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-serif: 'Playfair Display', Georgia, serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: var(--font-sans);
+      background: radial-gradient(circle at 20% 20%, #fff7f2 0%, #f7ebe4 45%, #ead8ce 100%);
+    }
+
+    /* Studio Presentation Frame (9:16 Aspect Ratio) */
+    .phone-viewport {
+      position: relative;
+      width: 100%;
+      height: 100dvh;
+      max-width: 100vw;
+      overflow: hidden;
+      background: #fdf8f5;
+      touch-action: none; /* Enables custom pinch-zoom and pan */
+    }
+
+    @media (min-width: 640px) {
+      .phone-viewport {
+        height: min(94dvh, 860px);
+        width: calc(min(94dvh, 860px) * 9 / 16);
+        border-radius: 36px;
+        box-shadow:
+          0 28px 70px -15px rgba(68, 42, 34, 0.26),
+          0 0 0 8px rgba(255, 255, 255, 0.85),
+          0 0 0 10px rgba(214, 185, 170, 0.45);
+      }
+    }
+
+    /* Glassmorphism Utilities */
+    .glass-panel {
+      background: rgba(255, 252, 250, 0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.78);
+    }
+
+    .glass-dark {
+      background: rgba(34, 24, 28, 0.52);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+    }
+
+    /* Top VPE Popup Transition */
+    .vpe-popup {
+      transform: translateY(-130%) scale(0.96);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.32s ease;
+    }
+
+    .vpe-popup.is-visible {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Simulated Order Toast Transition */
+    .order-toast {
+      transform: translateY(-20px) scale(0.94);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .order-toast.is-visible {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+
+    /* Interactive Button Micro-animations */
+    .ctrl-btn {
+      transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .ctrl-btn:active {
+      transform: scale(0.93);
+    }
+
+    .ctrl-btn.active-outfit {
+      background: linear-gradient(135deg, #fff5f7 0%, #ffe8ee 100%);
+      border-color: #e11d48;
+      box-shadow: 0 6px 16px -4px rgba(225, 29, 72, 0.28);
+    }
+
+    .ctrl-btn.active-scene {
+      background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+      border-color: #d97706;
+      box-shadow: 0 6px 16px -4px rgba(217, 119, 6, 0.26);
+    }
+
+    /* Shimmer effect on CTA button */
+    @keyframes shimmerSweep {
+      0% { transform: translateX(-120%) skewX(-20deg); }
+      60%, 100% { transform: translateX(220%) skewX(-20deg); }
+    }
+
+    .btn-shimmer::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 45%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+      animation: shimmerSweep 2.8s infinite;
+    }
+
+    /* Sound equalizer bars */
+    @keyframes eqBounce {
+      0%, 100% { transform: scaleY(0.35); }
+      50% { transform: scaleY(1); }
+    }
+    .eq-bar {
+      transform-origin: bottom;
+      animation: eqBounce 0.545s ease-in-out infinite; /* Synced to 110 BPM */
+    }
+    .eq-bar:nth-child(2) { animation-delay: 0.18s; }
+    .eq-bar:nth-child(3) { animation-delay: 0.36s; }
+    .paused-eq .eq-bar {
+      animation-play-state: paused;
+      transform: scaleY(0.3);
+    }
+
+    /* Glowing Play Button Pulse on Start Overlay */
+    @keyframes playPulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.55), 0 16px 36px -6px rgba(225, 29, 72, 0.45);
+      }
+      50% {
+        transform: scale(1.06);
+        box-shadow: 0 0 0 16px rgba(225, 29, 72, 0), 0 20px 42px -4px rgba(225, 29, 72, 0.55);
+      }
+    }
+
+    .play-cta-ring {
+      animation: playPulse 2.1s infinite cubic-bezier(0.4, 0, 0.6, 1);
+    }
+
+    .start-overlay {
+      background: rgba(255, 248, 245, 0.48);
+      backdrop-filter: blur(11px);
+      -webkit-backdrop-filter: blur(11px);
+      transition: opacity 0.45s ease, visibility 0.45s ease;
+    }
+
+    .start-overlay.is-hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center">
+
+  <!-- Auto-linked Background Audio for GitHub Pages (place music.mp3 in the same folder) -->
+  <audio id="bgMusic" src="./music.mp3" loop preload="auto"></audio>
+
+  <!-- Desktop Presentation Subtle Side Context (Hidden on Mobile) -->
+  <div class="hidden lg:flex flex-col justify-between max-w-xs mr-10 text-stone-700 select-none">
+    <div>
+      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-700 border border-rose-200 mb-3">
+        <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+        Interactive Video Stimulus (9:16)
+      </span>
+      <h1 class="text-2xl font-bold text-stone-900 leading-snug mb-2" style="font-family: var(--font-serif);">
+        Mô Phỏng Quảng Cáo Video Tương Tác
+      </h1>
+      <p class="text-sm text-stone-600 leading-relaxed mb-5">
+        Minh họa thực nghiệm tác động của <strong>Tính tương tác (PIN)</strong>, <strong>Độ sống động (VIV)</strong> và <strong>Quyền kiểm soát chủ động (ACO)</strong> đến hành vi mua ngẫu hứng của Gen Z.
+      </p>
+
+      <div class="space-y-2.5 text-xs text-stone-600 bg-white/75 p-4 rounded-2xl border border-white shadow-sm">
+        <div class="font-semibold text-stone-800 uppercase tracking-wider text-[11px] mb-1">Hướng dẫn thao tác Demo</div>
+        <div class="flex items-start gap-2">
+          <span class="text-rose-500 font-bold">1.</span>
+          <span>Bấm <strong>3 Set đồ</strong> để thay trang phục & kích hoạt popup <strong>Nhận thức giá trị (VPE)</strong> ở cạnh trên.</span>
+        </div>
+        <div class="flex items-start gap-2">
+          <span class="text-amber-600 font-bold">2.</span>
+          <span>Bấm <strong>3 Bối cảnh</strong> để đổi không gian & vũ đạo loop 110 BPM của nhân vật.</span>
+        </div>
+        <div class="flex items-start gap-2">
+          <span class="text-indigo-600 font-bold">3.</span>
+          <span><strong>Lăn chuột / Chụm 2 ngón</strong> để phóng to (tới 2.8x) & kéo xem chi tiết chất liệu trang phục.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-8 pt-4 border-t border-stone-300/60 text-[11px] text-stone-500">
+      Nghiên cứu sinh: <strong>Nguyễn Công Dũng</strong> • ĐH Kinh tế - Luật (ĐHQG-HCM)
+    </div>
+  </div>
+
+  <!-- 9:16 VERTICAL INTERACTIVE VIDEO VIEWPORT -->
+  <main id="phoneViewport" class="phone-viewport">
+    <!-- Full-Bleed Interactive Character & Scene Canvas -->
+    <canvas id="stageCanvas"></canvas>
+
+    <!-- START OVERLAY WITH CENTER PLAY BUTTON (Unlocks Audio on Mobile & GitHub Pages) -->
+    <div id="startOverlay" class="start-overlay absolute inset-0 z-50 flex flex-col items-center justify-center px-6 text-center">
+      <div class="mb-6 px-3.5 py-1 rounded-full bg-white/80 border border-rose-200/80 shadow-xs text-[11px] font-bold tracking-wider uppercase text-rose-600">
+        Interactive Fashion Video • 9:16
+      </div>
+
+      <button id="startPlayBtn" type="button" aria-label="Chạm để bắt đầu trải nghiệm"
+        class="play-cta-ring group relative w-24 h-24 rounded-full bg-gradient-to-br from-rose-500 via-pink-600 to-amber-500 text-white flex items-center justify-center cursor-pointer active:scale-95 transition-transform">
+        <svg class="w-10 h-10 ml-1.5 drop-shadow-sm transition-transform group-hover:scale-110" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M8 5.14v13.72a1 1 0 001.52.85l11-6.86a1 1 0 000-1.7l-11-6.86A1 1 0 008 5.14z"/>
+        </svg>
+      </button>
+
+      <h2 class="mt-6 text-lg font-extrabold text-stone-900 tracking-tight drop-shadow-xs">
+        Chạm để bắt đầu trải nghiệm
+      </h2>
+      <p class="mt-1.5 inline-flex items-center gap-1.5 text-xs font-medium text-stone-700 bg-white/75 px-3.5 py-1.5 rounded-full border border-white/90 shadow-xs">
+        <span>🔊</span>
+        <span>Bật âm thanh • Tương tác trực tiếp</span>
+      </p>
+    </div>
+
+    <!-- Subtle Top Gradient Vignette for UI Legibility -->
+    <div class="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/25 via-black/5 to-transparent z-10"></div>
+
+    <!-- TOP BAR: Scene Pill & 110 BPM Audio Toggle (Visible when VPE popup is closed, or neatly below) -->
+    <div id="topStatusBar" class="absolute top-3.5 inset-x-3.5 z-20 flex items-center justify-between transition-opacity duration-300">
+      <!-- Live Loop & Scene Status Badge -->
+      <div class="glass-dark text-white px-3 py-1.5 rounded-full flex items-center gap-2 shadow-sm">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+        <span id="currentContextLabel" class="text-[11px] font-medium tracking-wide">Ở nhà • Đồ ngủ pastel</span>
+      </div>
+
+      <!-- 110 BPM Music Toggle Button -->
+      <button id="audioToggleBtn" type="button" aria-label="Bật hoặc tắt âm thanh"
+        class="glass-dark text-white px-3 py-1.5 rounded-full flex items-center gap-2 shadow-sm hover:bg-black/65 transition active:scale-95 cursor-pointer">
+        <div id="eqVisualizer" class="paused-eq flex items-end gap-[2px] h-3 w-3">
+          <span class="eq-bar w-[2.5px] h-full bg-amber-300 rounded-full"></span>
+          <span class="eq-bar w-[2.5px] h-full bg-rose-300 rounded-full"></span>
+          <span class="eq-bar w-[2.5px] h-full bg-emerald-300 rounded-full"></span>
+        </div>
+        <span id="audioBtnText" class="text-[11px] font-semibold">Tắt tiếng</span>
+      </button>
+    </div>
+
+    <!-- TOP-POSITIONED VPE (PERCEIVED VALUE) POPUP — Never Covers Central Character -->
+    <section id="vpePopup" aria-live="polite"
+      class="vpe-popup absolute top-3 inset-x-3 z-30 glass-panel rounded-2xl p-3 shadow-xl">
+      <div class="flex items-center justify-between gap-2.5">
+        <!-- Outfit Color/Style Thumbnail -->
+        <div id="vpeThumb" class="w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center shadow-inner border border-white/80 bg-gradient-to-br from-amber-50 to-rose-100">
+          <!-- Dynamic SVG Icon injected via JS -->
+        </div>
+
+        <!-- Product Name & Value Perception (VPE) Cues -->
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-1.5 mb-0.5">
+            <span id="vpeDiscountBadge" class="inline-block px-1.5 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-wider bg-rose-600 text-white shadow-xs">
+              -40% FLASH SALE
+            </span>
+            <span class="text-[10px] font-semibold text-amber-700 truncate">
+              ⚡ Ưu đãi độc quyền trong video
+            </span>
+          </div>
+          <h2 id="vpeTitle" class="text-[13px] font-bold text-stone-900 truncate">
+            Set 1: Đầm Lụa Kem
+          </h2>
+          <div class="flex items-baseline gap-2 mt-0.5">
+            <span id="vpeSalePrice" class="text-[15px] font-extrabold text-rose-600">
+              749.000đ
+            </span>
+            <span id="vpeOrigPrice" class="text-[11px] text-stone-400 line-through font-medium">
+              1.250.000đ
+            </span>
+            <span class="text-[10px] font-medium text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded">
+              Freeship
+            </span>
+          </div>
+        </div>
+
+        <!-- CTA Checkout & Close Controls -->
+        <div class="flex items-center gap-1.5 flex-shrink-0">
+          <button id="checkoutBtn" type="button"
+            class="btn-shimmer relative overflow-hidden bg-gradient-to-r from-rose-600 via-pink-600 to-amber-500 text-white text-[11px] font-extrabold px-3 py-2.5 rounded-xl shadow-md shadow-rose-500/30 hover:brightness-105 active:scale-95 transition cursor-pointer leading-tight text-center">
+            CHỐT ĐƠN<br/>NGAY
+          </button>
+          <button id="closeVpeBtn" type="button" aria-label="Đóng bảng giá"
+            class="w-7 h-7 rounded-full bg-stone-200/75 hover:bg-stone-300/80 text-stone-600 flex items-center justify-center text-sm font-bold transition cursor-pointer">
+            ×
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SIMULATED ORDER CONFIRMATION TOAST (Appears briefly on checkout, auto-hides) -->
+    <div id="orderToast" role="status"
+      class="order-toast absolute top-24 inset-x-4 z-40 rounded-2xl bg-emerald-950/90 text-white px-4 py-3 shadow-2xl border border-emerald-400/40 backdrop-blur-md flex items-center gap-3">
+      <div class="w-9 h-9 rounded-full bg-emerald-500/25 border border-emerald-400 flex items-center justify-center text-lg flex-shrink-0">
+        🎉
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="text-xs font-bold text-emerald-300">Đã thêm vào đơn hàng!</div>
+        <div id="orderToastDetail" class="text-[11px] text-emerald-50/95 truncate">
+          Giữ ưu đãi 749.000đ thành công
+        </div>
+      </div>
+    </div>
+
+    <!-- ZOOM HINT & RESET PILL (Floats cleanly above bottom controls) -->
+    <div class="absolute bottom-[164px] inset-x-3 z-20 flex items-center justify-between pointer-events-none">
+      <div id="zoomHintBadge" class="glass-dark text-white/90 text-[10px] px-2.5 py-1 rounded-full flex items-center gap-1.5">
+        <svg class="w-3 h-3 text-amber-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m-3-3h6"/>
+        </svg>
+        <span>Phóng to & kéo để soi chi tiết</span>
+      </div>
+
+      <button id="resetZoomBtn" type="button"
+        class="hidden pointer-events-auto bg-stone-900/85 text-white text-[11px] font-semibold px-3 py-1 rounded-full shadow-lg border border-white/25 hover:bg-stone-800 active:scale-95 transition cursor-pointer flex items-center gap-1">
+        <span>↺</span>
+        <span id="zoomLevelText">1x</span>
+      </button>
+    </div>
+
+    <!-- BOTTOM INTERACTIVE CONTROL DOCK (Thumb-Friendly 2-Row Layout) -->
+    <footer class="absolute bottom-3 inset-x-3 z-20 glass-panel rounded-3xl p-2.5 shadow-lg">
+      <!-- ROW 1: 3 OUTFIT BUTTONS (Chọn Set Đồ) -->
+      <div class="mb-2">
+        <div class="flex items-center justify-between px-1 mb-1">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-rose-700 flex items-center gap-1">
+            <span>👗</span> Chọn Set Đồ (Bấm xem giá)
+          </span>
+          <button id="resetPajamaBtn" type="button"
+            class="text-[10px] font-semibold text-stone-500 hover:text-rose-600 underline decoration-dotted cursor-pointer">
+            Mặc lại đồ ngủ
+          </button>
+        </div>
+
+        <div class="grid grid-cols-3 gap-1.5">
+          <!-- Outfit 1 -->
+          <button type="button" data-outfit="cream"
+            class="outfit-btn ctrl-btn rounded-2xl border border-stone-200/90 bg-white/90 px-2 py-2 flex flex-col items-center justify-center text-center cursor-pointer">
+            <span class="w-5 h-5 rounded-full bg-gradient-to-tr from-amber-200 via-orange-50 to-white border border-amber-300 shadow-xs mb-1"></span>
+            <span class="text-[11px] font-bold text-stone-800 leading-tight">Đầm Lụa Kem</span>
+            <span class="text-[9px] font-semibold text-rose-500 mt-0.5">749K</span>
+          </button>
+
+          <!-- Outfit 2 -->
+          <button type="button" data-outfit="tweed"
+            class="outfit-btn ctrl-btn rounded-2xl border border-stone-200/90 bg-white/90 px-2 py-2 flex flex-col items-center justify-center text-center cursor-pointer">
+            <span class="w-5 h-5 rounded-full bg-gradient-to-tr from-pink-300 via-rose-100 to-sky-100 border border-pink-300 shadow-xs mb-1"></span>
+            <span class="text-[11px] font-bold text-stone-800 leading-tight">Blazer & Váy</span>
+            <span class="text-[9px] font-semibold text-rose-500 mt-0.5">689K</span>
+          </button>
+
+          <!-- Outfit 3 -->
+          <button type="button" data-outfit="red"
+            class="outfit-btn ctrl-btn rounded-2xl border border-stone-200/90 bg-white/90 px-2 py-2 flex flex-col items-center justify-center text-center cursor-pointer">
+            <span class="w-5 h-5 rounded-full bg-gradient-to-tr from-rose-900 via-red-600 to-rose-400 border border-rose-700 shadow-xs mb-1"></span>
+            <span class="text-[11px] font-bold text-stone-800 leading-tight">Đầm Đỏ Tiệc</span>
+            <span class="text-[9px] font-semibold text-rose-500 mt-0.5">890K</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ROW 2: 3 SCENE BUTTONS (Đổi Bối Cảnh & Vũ Đạo) -->
+      <div>
+        <div class="flex items-center justify-between px-1 mb-1">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-amber-800 flex items-center gap-1">
+            <span>✨</span> Đổi Bối Cảnh & Phong Cách
+          </span>
+          <span class="text-[9px] font-medium text-stone-400">Catwalk Loop</span>
+        </div>
+
+        <div class="grid grid-cols-3 gap-1.5">
+          <!-- Scene 1: Beach Resort -->
+          <button type="button" data-scene="beach"
+            class="scene-btn ctrl-btn rounded-2xl border border-stone-200/90 bg-white/90 px-2 py-2 flex items-center justify-center gap-1.5 cursor-pointer">
+            <span class="text-sm">🏖️</span>
+            <span class="text-[11px] font-bold text-stone-800">Bãi Biển</span>
+          </button>
+
+          <!-- Scene 2: Chic Alley Street -->
+          <button type="button" data-scene="cafe"
+            class="scene-btn ctrl-btn rounded-2xl border border-stone-200/90 bg-white/90 px-2 py-2 flex items-center justify-center gap-1.5 cursor-pointer">
+            <span class="text-sm">🏮</span>
+            <span class="text-[11px] font-bold text-stone-800">Hẻm Phố</span>
+          </button>
+
+          <!-- Scene 3: Red Carpet / Luxury Restaurant -->
+          <button type="button" data-scene="gala"
+            class="scene-btn ctrl-btn rounded-2xl border border-stone-200/90 bg-white/90 px-2 py-2 flex items-center justify-center gap-1.5 cursor-pointer">
+            <span class="text-sm">🥂</span>
+            <span class="text-[11px] font-bold text-stone-800">Dạ Tiệc</span>
+          </button>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    /**
+     * ============================================================================
+     * 1. DATA CONFIGURATION: OUTFITS (VPE) & SCENES (PERSPECTIVE + HAIR/MAKEUP)
+     * ============================================================================
+     */
+    const OUTFIT_DATA = {
+      pajama: {
+        id: 'pajama',
+        shortName: 'Đồ ngủ pastel',
+        title: 'Set Đồ Ngủ Lụa Kẻ Pastel',
+        salePrice: '320.000đ',
+        origPrice: '490.000đ',
+        discount: '-35%',
+        accent: '#7dd3fc'
+      },
+      cream: {
+        id: 'cream',
+        shortName: 'Đầm Lụa Kem',
+        title: 'Set 1: Đầm Lụa Kem',
+        salePrice: '749.000đ',
+        origPrice: '1.250.000đ',
+        discount: '-40% FLASH SALE',
+        accent: '#f59e0b',
+        svgIcon: `<svg class="w-7 h-7 text-amber-600" viewBox="0 0 32 32" fill="none">
+          <path d="M10 10C10 8.89543 10.8954 8 12 8H20C21.1046 8 22 8.89543 22 10L24 26H8L10 10Z" fill="#FEF3C7" stroke="#D97706" stroke-width="1.8"/>
+          <path d="M11 14H21" stroke="#D97706" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="16" cy="5.5" r="1.5" fill="#F59E0B"/>
+        </svg>`
+      },
+      tweed: {
+        id: 'tweed',
+        shortName: 'Blazer & Váy',
+        title: 'Set 2: Blazer & Váy',
+        salePrice: '689.000đ',
+        origPrice: '1.150.000đ',
+        discount: '-40% FLASH SALE',
+        accent: '#ec4899',
+        svgIcon: `<svg class="w-7 h-7 text-pink-600" viewBox="0 0 32 32" fill="none">
+          <path d="M9 9L13 7H19L23 9L25 17H21V15H11V17H7L9 9Z" fill="#FCE7F3" stroke="#DB2777" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M11 18H21L23 26H9L11 18Z" fill="#FFF1F2" stroke="#DB2777" stroke-width="1.8" stroke-linejoin="round"/>
+        </svg>`
+      },
+      red: {
+        id: 'red',
+        shortName: 'Đầm Đỏ Tiệc',
+        title: 'Set 3: Đầm Đỏ Tiệc',
+        salePrice: '890.000đ',
+        origPrice: '1.490.000đ',
+        discount: '-40% FLASH SALE',
+        accent: '#e11d48',
+        svgIcon: `<svg class="w-7 h-7 text-rose-700" viewBox="0 0 32 32" fill="none">
+          <path d="M8 11C10 9.5 13 10.5 16 10.5C19 10.5 22 9.5 24 11L22 15L25 27H7L10 15L8 11Z" fill="#FFE4E6" stroke="#BE123C" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M12 15H20" stroke="#BE123C" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>`
+      }
+    };
+
+    const SCENE_DATA = {
+      bedroom: {
+        id: 'bedroom',
+        label: 'Ở nhà',
+        walkStyle: 'home'
+      },
+      beach: {
+        id: 'beach',
+        label: 'Bãi Biển',
+        walkStyle: 'beach'
+      },
+      cafe: {
+        id: 'cafe',
+        label: 'Hẻm Phố',
+        walkStyle: 'alley'
+      },
+      gala: {
+        id: 'gala',
+        label: 'Dạ Tiệc',
+        walkStyle: 'gala'
+      }
+    };
+
+    /**
+     * ============================================================================
+     * 2. APPLICATION STATE & CAMERA ZOOM/PAN CONTROLLER
+     * ============================================================================
+     */
+    const state = {
+      outfit: 'pajama',
+      scene: 'bedroom',
+      bpm: 110,
+      startTime: performance.now(),
+      transitionFlash: 0,
+      particles: [],
+      // Camera zoom & pan state
+      zoom: 1,
+      targetZoom: 1,
+      panX: 0,
+      panY: 0,
+      targetPanX: 0,
+      targetPanY: 0,
+      isDragging: false,
+      isPinching: false,
+      dragStartX: 0,
+      dragStartY: 0,
+      initialPinchDist: null,
+      initialPinchZoom: 1,
+      lastPinchMidX: 0,
+      lastPinchMidY: 0
+    };
+
+    /**
+     * ============================================================================
+     * 3. HYBRID AUDIO ENGINE: AUTO-LINKS ./music.mp3 + 110 BPM SYNTH FALLBACK
+     * ============================================================================
+     */
+    class FashionBeatEngine {
+      constructor(bpm = 110) {
+        this.bpm = bpm;
+        this.audioEl = document.getElementById('bgMusic');
+        if (this.audioEl) {
+          this.audioEl.volume = 20 / 100; // Mức âm lượng 30/100 (có thể chỉnh từ 1 đến 100)
+        }
+        this.useExternalMp3 = true;
+        this.ctx = null;
+        this.isPlaying = false;
+        this.timerId = null;
+        this.step = 0;
+        // 16th note duration in seconds at 110 BPM (~0.13636s)
+        this.stepDuration = 60 / this.bpm / 4;
+
+        if (this.audioEl) {
+          this.audioEl.addEventListener('error', () => {
+            // Automatically switch to built-in 110 BPM groove if ./music.mp3 is missing
+            this.useExternalMp3 = false;
+            if (this.isPlaying && !this.timerId) {
+              this.startSynthLoop();
+            }
+          });
+        }
+      }
+
+      initSynth() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioCtx();
+        }
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      toggle() {
+        if (this.isPlaying) {
+          this.stop();
+        } else {
+          this.start(false);
+        }
+        return this.isPlaying;
+      }
+
+      start(resetToBeginning = false) {
+        if (this.isPlaying && !resetToBeginning) return;
+        this.isPlaying = true;
+        this.updateUI();
+
+        if (this.useExternalMp3 && this.audioEl) {
+          if (resetToBeginning) {
+            this.audioEl.currentTime = 0;
+          }
+          this.audioEl.loop = true;
+          const playPromise = this.audioEl.play();
+          if (playPromise !== undefined) {
+            playPromise.catch(() => {
+              // Fallback to Web Audio API synth if ./music.mp3 is unavailable
+              this.useExternalMp3 = false;
+              this.startSynthLoop();
+            });
+          }
+        } else {
+          this.startSynthLoop();
+        }
+      }
+
+      startSynthLoop() {
+        try {
+          this.initSynth();
+          if (this.timerId) return;
+          this.tick();
+        } catch (err) {
+          console.warn('Audio synth prevented:', err);
+        }
+      }
+
+      stop() {
+        this.isPlaying = false;
+        if (this.audioEl && !this.audioEl.paused) {
+          this.audioEl.pause();
+        }
+        if (this.timerId) {
+          clearTimeout(this.timerId);
+          this.timerId = null;
+        }
+        this.updateUI();
+      }
+
+      updateUI() {
+        const btnText = document.getElementById('audioBtnText');
+        const eq = document.getElementById('eqVisualizer');
+        if (this.isPlaying) {
+          btnText.textContent = 'Đang phát nhạc';
+          eq.classList.remove('paused-eq');
+        } else {
+          btnText.textContent = 'Tắt tiếng';
+          eq.classList.add('paused-eq');
+        }
+      }
+
+      tick() {
+        if (!this.isPlaying || this.useExternalMp3) {
+          this.timerId = null;
+          return;
+        }
+        const now = this.ctx.currentTime;
+        this.scheduleStep(this.step, now);
+        this.step = (this.step + 1) % 32; // 2-bar loop (32 sixteenth notes)
+        this.timerId = setTimeout(() => this.tick(), this.stepDuration * 1000);
+      }
+
+      scheduleStep(step, t) {
+        // 1. Punchy Pop Kick on 0, 4, 8, 12 (Four-on-the-floor)
+        if (step % 4 === 0) {
+          this.playKick(t);
+        }
+
+        // 2. Crisp Clap / Snare on 4 and 12 (Beats 2 and 4)
+        if (step % 8 === 4) {
+          this.playClap(t);
+        }
+
+        // 3. Upbeat Off-beat Hi-hat on 2, 6, 10, 14 + subtle 16th ghost hats
+        if (step % 4 === 2) {
+          this.playHat(t, 0.08, 0.07);
+        } else if (step % 2 === 1) {
+          this.playHat(t, 0.025, 0.03);
+        }
+
+        // 4. Warm Electric Piano Chords (Fmaj7 -> Em7 -> Dm7 -> G13)
+        const chordMap = {
+          0: [349.23, 440.00, 523.25, 659.25], // Fmaj7
+          6: [349.23, 440.00, 523.25, 659.25], // syncopated stab
+          8: [329.63, 392.00, 493.88, 587.33], // Em7
+          16: [293.66, 349.23, 440.00, 523.25], // Dm7
+          22: [293.66, 349.23, 440.00, 523.25],
+          24: [392.00, 493.88, 587.33, 659.25]  // G13
+        };
+        if (chordMap[step]) {
+          this.playChord(chordMap[step], t, step % 8 === 6 ? 0.25 : 0.55);
+        }
+
+        // 5. Bouncy Funk/Pop Bassline
+        const bassNotes = {
+          0: 87.31, 3: 87.31, 6: 130.81,
+          8: 82.41, 11: 82.41, 14: 123.47,
+          16: 73.42, 19: 73.42, 22: 110.00,
+          24: 98.00, 27: 98.00, 30: 110.00
+        };
+        if (bassNotes[step]) {
+          this.playBass(bassNotes[step], t, 0.22);
+        }
+
+        // 6. Sparkly High Bell Arpeggio
+        const bellNotes = {
+          2: 1046.50, 10: 987.77, 18: 880.00, 26: 1174.66, 30: 1318.51
+        };
+        if (bellNotes[step]) {
+          this.playBell(bellNotes[step], t);
+        }
+      }
+
+      playKick(t) {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(135, t);
+        osc.frequency.exponentialRampToValueAtTime(42, t + 0.14);
+
+        gain.gain.setValueAtTime(0.28, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.16);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.17);
+      }
+
+      playClap(t) {
+        const bufferSize = this.ctx.sampleRate * 0.12;
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.28));
+        }
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(1450, t);
+        filter.Q.setValueAtTime(1.2, t);
+
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(0.16, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+        noise.start(t);
+      }
+
+      playHat(t, vol, dur) {
+        const bufferSize = this.ctx.sampleRate * dur;
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.3));
+        }
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'highpass';
+        filter.frequency.setValueAtTime(7500, t);
+
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(vol, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+        noise.start(t);
+      }
+
+      playChord(freqs, t, dur) {
+        freqs.forEach((f) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(f, t);
+
+          gain.gain.setValueAtTime(0.001, t);
+          gain.gain.linearRampToValueAtTime(0.038, t + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0008, t + dur);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(t);
+          osc.stop(t + dur + 0.02);
+        });
+      }
+
+      playBass(freq, t, dur) {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, t);
+
+        gain.gain.setValueAtTime(0.16, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + dur + 0.02);
+      }
+
+      playBell(freq, t) {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, t);
+
+        gain.gain.setValueAtTime(0.032, t);
+        gain.gain.exponentialRampToValueAtTime(0.0005, t + 0.28);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.3);
+      }
+
+      playChime() {
+        try {
+          this.initSynth();
+          const now = this.ctx.currentTime;
+          [880, 1108.73, 1318.51, 1760].forEach((freq, idx) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + idx * 0.045);
+            gain.gain.setValueAtTime(0.05, now + idx * 0.045);
+            gain.gain.exponentialRampToValueAtTime(0.0008, now + idx * 0.045 + 0.35);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now + idx * 0.045);
+            osc.stop(now + idx * 0.045 + 0.36);
+          });
+        } catch (e) {}
+      }
+    }
+
+    const beatEngine = new FashionBeatEngine(110);
+
+    // Start Overlay Play Button Handler
+    const startOverlay = document.getElementById('startOverlay');
+    const startPlayBtn = document.getElementById('startPlayBtn');
+
+    startPlayBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      beatEngine.start(true); // Starts ./music.mp3 from 0:00 with loop = true
+      beatEngine.playChime();
+      spawnTransitionParticles('#fb7185');
+      startOverlay.classList.add('is-hidden');
+    });
+
+    /**
+     * ============================================================================
+     * 4. CANVAS RENDERING ENGINE: 4 SCENES + 4 OUTFITS + 110 BPM CHOREOGRAPHY
+     * ============================================================================
+     */
+    const canvas = document.getElementById('stageCanvas');
+    const ctx = canvas.getContext('2d');
+    const viewportEl = document.getElementById('phoneViewport');
+
+    function resizeCanvas() {
+      const rect = viewportEl.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // Spawn celebratory sparkles / petals on change
+    function spawnTransitionParticles(color = '#f43f5e') {
+      const rect = viewportEl.getBoundingClientRect();
+      const cx = rect.width * 0.5;
+      const cy = rect.height * 0.48;
+      state.transitionFlash = 1.0;
+
+      for (let i = 0; i < 34; i++) {
+        const angle = (Math.PI * 2 * i) / 34 + (Math.random() - 0.5) * 0.3;
+        const speed = 1.8 + Math.random() * 4.8;
+        state.particles.push({
+          x: cx + (Math.random() - 0.5) * 70,
+          y: cy + (Math.random() - 0.5) * 140,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 1.2,
+          size: 3 + Math.random() * 5.5,
+          alpha: 1,
+          color: i % 3 === 0 ? '#fde047' : i % 3 === 1 ? '#ffffff' : color,
+          shape: i % 2 === 0 ? 'star' : 'circle'
+        });
+      }
+    }
+
+    function drawStar(ctx, x, y, r, color, alpha) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.globalAlpha = Math.max(0, alpha);
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      for (let i = 0; i < 4; i++) {
+        const a = (i * Math.PI) / 2;
+        ctx.lineTo(Math.cos(a) * r * 1.8, Math.sin(a) * r * 1.8);
+        ctx.lineTo(Math.cos(a + Math.PI / 4) * r * 0.5, Math.sin(a + Math.PI / 4) * r * 0.5);
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // ------------------- SCENE BACKGROUNDS -------------------
+
+    function drawBedroomScene(w, h, beatPhase) {
+      // Warm sunlit pastel bedroom wall
+      const wallGrad = ctx.createLinearGradient(0, 0, 0, h);
+      wallGrad.addColorStop(0, '#fff7ed');
+      wallGrad.addColorStop(0.55, '#fdeee7');
+      wallGrad.addColorStop(1, '#f3dfd3');
+      ctx.fillStyle = wallGrad;
+      ctx.fillRect(0, 0, w, h);
+
+      // Large bright morning window on left
+      const winX = w * 0.08;
+      const winY = h * 0.12;
+      const winW = w * 0.38;
+      const winH = h * 0.36;
+
+      ctx.fillStyle = '#e0f2fe';
+      ctx.beginPath();
+      ctx.roundRect(winX, winY, winW, winH, 16);
+      ctx.fill();
+
+      // Sunbeams streaming diagonally
+      const beamGrad = ctx.createLinearGradient(winX, winY, w * 0.85, h * 0.78);
+      beamGrad.addColorStop(0, 'rgba(255, 251, 235, 0.55)');
+      beamGrad.addColorStop(1, 'rgba(255, 251, 235, 0)');
+      ctx.fillStyle = beamGrad;
+      ctx.beginPath();
+      ctx.moveTo(winX, winY);
+      ctx.lineTo(winX + winW, winY);
+      ctx.lineTo(w * 0.95, h * 0.78);
+      ctx.lineTo(w * 0.25, h * 0.78);
+      ctx.closePath();
+      ctx.fill();
+
+      // Window panes & sheer curtain swaying gently
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(winX, winY, winW, winH);
+      ctx.beginPath();
+      ctx.moveTo(winX + winW / 2, winY);
+      ctx.lineTo(winX + winW / 2, winY + winH);
+      ctx.moveTo(winX, winY + winH / 2);
+      ctx.lineTo(winX + winW, winY + winH / 2);
+      ctx.stroke();
+
+      const sway = Math.sin(beatPhase * Math.PI) * 5;
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.72)';
+      ctx.beginPath();
+      ctx.moveTo(winX - 6, winY - 4);
+      ctx.quadraticCurveTo(winX + 26 + sway, winY + winH * 0.5, winX + 18 + sway * 1.4, winY + winH + 14);
+      ctx.lineTo(winX - 8, winY + winH + 14);
+      ctx.closePath();
+      ctx.fill();
+
+      // Minimalist wooden clothing rack on right (fashion mood!)
+      const rackX = w * 0.68;
+      const rackY = h * 0.24;
+      ctx.strokeStyle = '#b08968';
+      ctx.lineWidth = 3.5;
+      ctx.beginPath();
+      ctx.moveTo(rackX, rackY);
+      ctx.lineTo(w * 0.92, rackY);
+      ctx.moveTo(rackX + 8, rackY);
+      ctx.lineTo(rackX + 4, h * 0.66);
+      ctx.moveTo(w * 0.92 - 8, rackY);
+      ctx.lineTo(w * 0.92 - 4, h * 0.66);
+      ctx.stroke();
+
+      // Hanging pastel garments on rack
+      const hangerColors = ['#fecdd3', '#fef3c7', '#e0e7ff', '#fce7f3'];
+      hangerColors.forEach((col, i) => {
+        const hx = rackX + 16 + i * 16;
+        ctx.fillStyle = col;
+        ctx.beginPath();
+        ctx.roundRect(hx, rackY + 8, 12, 68 + (i % 2) * 14, 5);
+        ctx.fill();
+      });
+
+      // Warm wooden floor & fluffy cream rug
+      ctx.fillStyle = '#e6ccb2';
+      ctx.fillRect(0, h * 0.66, w, h * 0.34);
+
+      ctx.fillStyle = '#fffaf5';
+      ctx.beginPath();
+      ctx.ellipse(w * 0.5, h * 0.76, w * 0.42, h * 0.08, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#f3d5b5';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    function drawBeachScene(w, h, beatPhase) {
+      // Bright tropical sky
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, h * 0.56);
+      skyGrad.addColorStop(0, '#38bdf8');
+      skyGrad.addColorStop(0.55, '#bae6fd');
+      skyGrad.addColorStop(1, '#fef9c3');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, w, h * 0.56);
+
+      // Radiant sun glow
+      const sunX = w * 0.78;
+      const sunY = h * 0.16;
+      const sunGlow = ctx.createRadialGradient(sunX, sunY, 8, sunX, sunY, 110);
+      sunGlow.addColorStop(0, 'rgba(254, 249, 195, 0.95)');
+      sunGlow.addColorStop(0.4, 'rgba(253, 224, 71, 0.35)');
+      sunGlow.addColorStop(1, 'rgba(253, 224, 71, 0)');
+      ctx.fillStyle = sunGlow;
+      ctx.beginPath();
+      ctx.arc(sunX, sunY, 110, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Turquoise ocean with rhythmic waves
+      const seaGrad = ctx.createLinearGradient(0, h * 0.44, 0, h * 0.68);
+      seaGrad.addColorStop(0, '#0284c7');
+      seaGrad.addColorStop(0.5, '#06b6d4');
+      seaGrad.addColorStop(1, '#67e8f9');
+      ctx.fillStyle = seaGrad;
+      ctx.fillRect(0, h * 0.44, w, h * 0.24);
+
+      // Sparkling wave lines
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.55)';
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 6; i++) {
+        const wy = h * 0.47 + i * 16;
+        const shift = Math.sin(beatPhase * Math.PI + i) * 14;
+        ctx.beginPath();
+        ctx.moveTo(w * 0.08 + shift, wy);
+        ctx.quadraticCurveTo(w * 0.3 + shift, wy - 4, w * 0.52 + shift, wy);
+        ctx.stroke();
+      }
+
+      // Golden sandy beach & resort wooden deck
+      const sandGrad = ctx.createLinearGradient(0, h * 0.64, 0, h);
+      sandGrad.addColorStop(0, '#fde68a');
+      sandGrad.addColorStop(0.45, '#fcd34d');
+      sandGrad.addColorStop(1, '#f59e0b');
+      ctx.fillStyle = sandGrad;
+      ctx.fillRect(0, h * 0.64, w, h * 0.36);
+
+      // Gentle foam shoreline
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.72)';
+      ctx.beginPath();
+      ctx.ellipse(w * 0.5, h * 0.65, w * 0.65, 14 + Math.sin(beatPhase * Math.PI) * 4, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Tropical Palm Fronds framing top-left
+      ctx.save();
+      ctx.translate(0, h * 0.06);
+      const palmSway = Math.sin(beatPhase * Math.PI * 0.5) * 0.06;
+      ctx.rotate(palmSway);
+      const leafColors = ['#15803d', '#16a34a', '#22c55e'];
+      for (let i = 0; i < 5; i++) {
+        ctx.fillStyle = leafColors[i % 3];
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.quadraticCurveTo(75 + i * 16, -20 + i * 24, 150 + i * 12, 35 + i * 26);
+        ctx.quadraticCurveTo(75 + i * 10, 10 + i * 22, 0, 10);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    // ------------------- PERSPECTIVE FORWARD-SCROLLING BACKGROUNDS -------------------
+
+    function drawBedroomScene(w, h, walkPhase) {
+      const vpX = w * 0.5;
+      const vpY = h * 0.44;
+
+      // Warm sunlit pastel bedroom wall
+      const wallGrad = ctx.createLinearGradient(0, 0, 0, vpY + 40);
+      wallGrad.addColorStop(0, '#fff7ed');
+      wallGrad.addColorStop(1, '#fdeee7');
+      ctx.fillStyle = wallGrad;
+      ctx.fillRect(0, 0, w, vpY + 40);
+
+      // Perspective side walls converging to hallway/mirror vanishing point
+      ctx.fillStyle = '#f8e5da';
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(vpX - 45, vpY - 35);
+      ctx.lineTo(vpX - 45, vpY + 25);
+      ctx.lineTo(0, h * 0.66);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(w, 0);
+      ctx.lineTo(vpX + 45, vpY - 35);
+      ctx.lineTo(vpX + 45, vpY + 25);
+      ctx.lineTo(w, h * 0.66);
+      ctx.closePath();
+      ctx.fill();
+
+      // Sunlit window on left wall
+      ctx.fillStyle = '#e0f2fe';
+      ctx.beginPath();
+      ctx.moveTo(w * 0.05, h * 0.14);
+      ctx.lineTo(w * 0.28, h * 0.24);
+      ctx.lineTo(w * 0.28, h * 0.52);
+      ctx.lineTo(w * 0.05, h * 0.56);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      // Minimalist clothing rack on right
+      ctx.strokeStyle = '#b08968';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(w * 0.74, h * 0.26);
+      ctx.lineTo(w * 0.94, h * 0.18);
+      ctx.moveTo(w * 0.75, h * 0.26);
+      ctx.lineTo(w * 0.75, h * 0.55);
+      ctx.moveTo(w * 0.92, h * 0.19);
+      ctx.lineTo(w * 0.92, h * 0.58);
+      ctx.stroke();
+
+      // Perspective wooden floor moving smoothly away into vanishing point (front tracking shot)
+      const floorGrad = ctx.createLinearGradient(0, vpY + 20, 0, h);
+      floorGrad.addColorStop(0, '#ebd3bd');
+      floorGrad.addColorStop(1, '#dcbfa3');
+      ctx.fillStyle = floorGrad;
+      ctx.fillRect(0, vpY + 20, w, h - vpY);
+
+      // Scrolling perspective floor planks
+      ctx.strokeStyle = 'rgba(168, 126, 94, 0.25)';
+      ctx.lineWidth = 1.5;
+      for (let i = -4; i <= 4; i++) {
+        ctx.beginPath();
+        ctx.moveTo(vpX + i * 14, vpY + 20);
+        ctx.lineTo(vpX + i * 95, h);
+        ctx.stroke();
+      }
+      const scroll = 1 - (walkPhase % 1);
+      for (let i = 0; i < 7; i++) {
+        const t = Math.pow((i + scroll) / 7, 1.8);
+        const y = vpY + 20 + t * (h - vpY - 20);
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(w, y);
+        ctx.stroke();
+      }
+    }
+
+    function drawBeachScene(w, h, walkPhase) {
+      // Vanishing Point on distant ocean horizon
+      const vpX = w * 0.42;
+      const vpY = h * 0.43;
+
+      // 1. Radiant Coastal Sky
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, vpY);
+      skyGrad.addColorStop(0, '#0ea5e9');
+      skyGrad.addColorStop(0.6, '#7dd3fc');
+      skyGrad.addColorStop(1, '#fef9c3');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, w, vpY + 2);
+
+      // Soft distant clouds & warm sun
+      const sunX = w * 0.24;
+      const sunY = h * 0.14;
+      const sunGlow = ctx.createRadialGradient(sunX, sunY, 6, sunX, sunY, 95);
+      sunGlow.addColorStop(0, 'rgba(255, 251, 235, 0.95)');
+      sunGlow.addColorStop(0.45, 'rgba(253, 224, 71, 0.35)');
+      sunGlow.addColorStop(1, 'rgba(253, 224, 71, 0)');
+      ctx.fillStyle = sunGlow;
+      ctx.beginPath();
+      ctx.arc(sunX, sunY, 95, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Distant tropical headland silhouette at vanishing horizon
+      ctx.fillStyle = '#38bdf8';
+      ctx.beginPath();
+      ctx.moveTo(0, vpY);
+      ctx.quadraticCurveTo(w * 0.14, vpY - 18, vpX - 18, vpY);
+      ctx.closePath();
+      ctx.fill();
+
+      // 2. Deep-to-Turquoise Ocean stretching to vanishing point (Left side)
+      const seaGrad = ctx.createLinearGradient(0, vpY, w * 0.5, h);
+      seaGrad.addColorStop(0, '#0284c7');
+      seaGrad.addColorStop(0.5, '#06b6d4');
+      seaGrad.addColorStop(1, '#22d3ee');
+      ctx.fillStyle = seaGrad;
+      ctx.beginPath();
+      ctx.moveTo(0, vpY);
+      ctx.lineTo(vpX, vpY);
+      ctx.lineTo(w * 0.22, h);
+      ctx.lineTo(0, h);
+      ctx.closePath();
+      ctx.fill();
+
+      // 3. Golden Sand Beach & Resort Boardwalk converging to Vanishing Point (Right/Center)
+      const sandGrad = ctx.createLinearGradient(vpX, vpY, w, h);
+      sandGrad.addColorStop(0, '#fef08a');
+      sandGrad.addColorStop(0.45, '#fde68a');
+      sandGrad.addColorStop(1, '#f59e0b');
+      ctx.fillStyle = sandGrad;
+      ctx.beginPath();
+      ctx.moveTo(vpX, vpY);
+      ctx.lineTo(w, vpY);
+      ctx.lineTo(w, h);
+      ctx.lineTo(w * 0.22, h);
+      ctx.closePath();
+      ctx.fill();
+
+      // 4. Animated Shoreline Foam & Rolling Waves converging to Vanishing Point
+      const waveOffset = 1 - ((walkPhase * 0.7) % 1);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(vpX, vpY);
+      ctx.lineTo(w * 0.22 + Math.sin(walkPhase * Math.PI) * 8, h);
+      ctx.stroke();
+
+      // Perspective ocean wave crests receding toward vanishing point
+      for (let i = 0; i < 6; i++) {
+        const t = Math.pow((i + waveOffset) / 6, 1.7);
+        const wy = vpY + t * (h - vpY);
+        const rightEdge = vpX + t * (w * 0.22 - vpX);
+        ctx.strokeStyle = `rgba(255, 255, 255, ${0.2 + t * 0.45})`;
+        ctx.lineWidth = 1 + t * 2.2;
+        ctx.beginPath();
+        ctx.moveTo(0, wy);
+        ctx.lineTo(rightEdge - 6, wy);
+        ctx.stroke();
+      }
+
+      // 5. Perspective Wooden Beach Walkway & Passing Palm Trees / Resort Umbrellas
+      const scroll = 1 - (walkPhase % 1);
+      // Subtle wooden boardwalk planks on center-right sand
+      ctx.fillStyle = 'rgba(180, 120, 68, 0.22)';
+      ctx.beginPath();
+      ctx.moveTo(vpX + 8, vpY);
+      ctx.lineTo(vpX + 26, vpY);
+      ctx.lineTo(w * 0.86, h);
+      ctx.lineTo(w * 0.34, h);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.strokeStyle = 'rgba(146, 92, 46, 0.32)';
+      for (let i = 0; i < 9; i++) {
+        const t = Math.pow((i + scroll) / 9, 1.85);
+        const py = vpY + t * (h - vpY);
+        const xLeft = (vpX + 8) + t * (w * 0.34 - (vpX + 8));
+        const xRight = (vpX + 26) + t * (w * 0.86 - (vpX + 26));
+        ctx.lineWidth = 0.8 + t * 2.2;
+        ctx.beginPath();
+        ctx.moveTo(xLeft, py);
+        ctx.lineTo(xRight, py);
+        ctx.stroke();
+      }
+
+      // Passing Palm Trees & Striped Beach Umbrellas along the right shoreline
+      for (let i = 0; i < 4; i++) {
+        const rawT = (i + scroll) / 4;
+        const t = Math.pow(rawT, 2.1); // Perspective acceleration as objects pass camera
+        const objX = (vpX + 34) + t * (w * 0.98 - (vpX + 34));
+        const objY = vpY + t * (h * 0.82 - vpY);
+        const scale = 0.14 + t * 1.15;
+
+        ctx.save();
+        ctx.translate(objX, objY);
+        ctx.scale(scale, scale);
+
+        if (i % 2 === 0) {
+          // Tropical Palm Tree
+          ctx.strokeStyle = '#92400e';
+          ctx.lineWidth = 8;
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.quadraticCurveTo(-8, -65, 6, -125);
+          ctx.stroke();
+
+          ctx.fillStyle = '#16a34a';
+          for (let f = 0; f < 5; f++) {
+            ctx.save();
+            ctx.translate(6, -125);
+            ctx.rotate(-0.7 + f * 0.38);
+            ctx.beginPath();
+            ctx.ellipse(26, 0, 30, 8, 0.15, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+          }
+        } else {
+          // Chic Cream-Coral Resort Umbrella
+          ctx.strokeStyle = '#78350f';
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(0, -75);
+          ctx.stroke();
+
+          ctx.fillStyle = '#fffbeb';
+          ctx.beginPath();
+          ctx.arc(0, -72, 42, Math.PI, 0);
+          ctx.fill();
+          ctx.fillStyle = '#fb7185';
+          ctx.beginPath();
+          ctx.arc(0, -72, 42, Math.PI * 1.25, Math.PI * 1.75);
+          ctx.lineTo(0, -72);
+          ctx.closePath();
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+    }
+
+    function drawCafeScene(w, h, walkPhase) {
+      // Aesthetic Sunlit Alley / Hẻm Phố Café with Lush Flowers & Greenery
+      const vpX = w * 0.5;
+      const vpY = h * 0.44;
+      const scroll = 1 - (walkPhase % 1);
+
+      // 1. Warm Sky strip at top of alley
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, vpY);
+      skyGrad.addColorStop(0, '#bae6fd');
+      skyGrad.addColorStop(1, '#fef3c7');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, w, vpY + 5);
+
+      // Distant sunlit alley end-building at vanishing point
+      ctx.fillStyle = '#fde68a';
+      ctx.fillRect(vpX - 38, vpY - 52, 76, 56);
+      ctx.fillStyle = '#f59e0b';
+      ctx.fillRect(vpX - 14, vpY - 26, 28, 30);
+
+      // 2. Left & Right Alley Walls converging sharply to Vanishing Point
+      // Left Wall (Warm Cream Plaster)
+      ctx.fillStyle = '#fff7ed';
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(vpX - 38, vpY - 52);
+      ctx.lineTo(vpX - 38, vpY + 4);
+      ctx.lineTo(0, h * 0.72);
+      ctx.closePath();
+      ctx.fill();
+
+      // Right Wall (Pastel Terracotta / Blush Café Wall)
+      ctx.fillStyle = '#ffe4e6';
+      ctx.beginPath();
+      ctx.moveTo(w, 0);
+      ctx.lineTo(vpX + 38, vpY - 52);
+      ctx.lineTo(vpX + 38, vpY + 4);
+      ctx.lineTo(w, h * 0.72);
+      ctx.closePath();
+      ctx.fill();
+
+      // 3. Cobblestone / Brick Alley Pavement converging to Vanishing Point
+      const roadGrad = ctx.createLinearGradient(0, vpY, 0, h);
+      roadGrad.addColorStop(0, '#d6ccc2');
+      // 4. Passing Café Windows, Lush Greenery, Blooming Flowers & Overhead Lights
+      for (let i = 0; i < 4; i++) {
+        const rawT = (i + scroll) / 4;
+        const t = Math.pow(rawT, 2.05);
+
+        // Overhead string lights / greenery garlands arching across the alley
+        const archY = (vpY - 44) + t * (h * 0.08 - (vpY - 44));
+        const leftX = (vpX - 38) + t * (0 - (vpX - 38));
+        const rightX = (vpX + 38) + t * (w - (vpX + 38));
+
+        ctx.strokeStyle = `rgba(22, 101, 52, ${0.32 + t * 0.55})`;
+        ctx.lineWidth = 1.5 + t * 2;
+        ctx.beginPath();
+        ctx.moveTo(leftX, archY);
+        ctx.quadraticCurveTo(vpX, archY + 12 + t * 28, rightX, archY);
+        ctx.stroke();
+
+        // Warm glowing café bulbs & pink blossoms along the vine
+        for (let b = 1; b <= 4; b++) {
+          const bt = b / 5;
+          const bx = leftX + (rightX - leftX) * bt;
+          const by = archY + Math.sin(bt * Math.PI) * (12 + t * 28);
+          ctx.fillStyle = b % 2 === 0 ? '#fef08a' : '#fb7185';
+          ctx.beginPath();
+          ctx.arc(bx, by, 1.8 + t * 3.2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Passing Left Café Window, Lush Bushes & Blooming Bougainvillea
+        const winScale = 0.16 + t * 1.1;
+        const leftFloorY = (vpY + 4) + t * (h * 0.72 - (vpY + 4));
+        ctx.save();
+        ctx.translate(leftX + 10 * winScale, leftFloorY);
+        ctx.scale(winScale, winScale);
+        // Wooden café window frame
+        ctx.fillStyle = '#bae6fd';
+        ctx.fillRect(0, -118, 40, 62);
+        ctx.strokeStyle = '#92400e';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(0, -118, 40, 62);
+        // Lush green foliage & pink/red flowers lining the left alley
+        ctx.fillStyle = '#15803d';
+        ctx.beginPath();
+        ctx.arc(14, -18, 22, 0, Math.PI * 2);
+        ctx.arc(34, -14, 18, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#22c55e';
+        ctx.beginPath();
+        ctx.arc(22, -28, 17, 0, Math.PI * 2);
+        ctx.fill();
+        // Blooming pink & coral flower clusters
+        ctx.fillStyle = '#f43f5e';
+        ctx.beginPath();
+        ctx.arc(10, -26, 6.5, 0, Math.PI * 2);
+        ctx.arc(26, -34, 7, 0, Math.PI * 2);
+        ctx.arc(36, -20, 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#fda4af';
+        ctx.beginPath();
+        ctx.arc(18, -20, 5.5, 0, Math.PI * 2);
+        ctx.arc(30, -26, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        // Passing Right Flowering Tree Shrubs & Terracotta Planters
+        const rightFloorY = (vpY + 4) + t * (h * 0.72 - (vpY + 4));
+        ctx.save();
+        ctx.translate(rightX - 10 * winScale, rightFloorY);
+        ctx.scale(winScale, winScale);
+        // Lush garden shrub & tree canopy on right wall
+        ctx.fillStyle = '#166534';
+        ctx.beginPath();
+        ctx.arc(-18, -24, 24, 0, Math.PI * 2);
+        ctx.arc(-36, -16, 17, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#4ade80';
+        ctx.beginPath();
+        ctx.arc(-22, -36, 16, 0, Math.PI * 2);
+        ctx.fill();
+        // Yellow & rose flower blossoms
+        ctx.fillStyle = '#fb7185';
+        ctx.beginPath();
+        ctx.arc(-14, -34, 6.5, 0, Math.PI * 2);
+        ctx.arc(-30, -24, 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#fde047';
+        ctx.beginPath();
+        ctx.arc(-24, -42, 5.5, 0, Math.PI * 2);
+        ctx.arc(-16, -22, 5, 0, Math.PI * 2);
+        ctx.fill();
+        // Terracotta flower pot
+        ctx.fillStyle = '#d97706';
+        ctx.beginPath();
+        ctx.moveTo(-28, -14);
+        ctx.lineTo(-8, -14);
+        ctx.lineTo(-11, 0);
+        ctx.lineTo(-25, 0);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function drawGalaScene(w, h, walkPhase) {
+      // Luxury Gala Restaurant & Banquet Hall with Vanishing Point
+      const vpX = w * 0.5;
+      const vpY = h * 0.44;
+      const scroll = 1 - (walkPhase % 1);
+
+      // 1. Rich Twilight-Burgundy & Gold Architectural Interior
+      const wallGrad = ctx.createLinearGradient(0, 0, 0, h);
+      wallGrad.addColorStop(0, '#1e1b4b');
+      wallGrad.addColorStop(0.45, '#4a0e2e');
+      wallGrad.addColorStop(1, '#270917');
+      ctx.fillStyle = wallGrad;
+      ctx.fillRect(0, 0, w, h);
+
+      // Warm golden chandelier glow at vanishing point arch
+      const archGlow = ctx.createRadialGradient(vpX, vpY - 25, 8, vpX, vpY, w * 0.65);
+      archGlow.addColorStop(0, 'rgba(254, 240, 138, 0.75)');
+      archGlow.addColorStop(0.45, 'rgba(251, 191, 36, 0.22)');
+      archGlow.addColorStop(1, 'rgba(251, 191, 36, 0)');
+      ctx.fillStyle = archGlow;
+      ctx.fillRect(0, 0, w, h);
+
+      // Grand golden entrance archway at vanishing point
+      ctx.strokeStyle = '#fbbf24';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(vpX, vpY - 12, 34, Math.PI, 0);
+      ctx.lineTo(vpX + 34, vpY + 8);
+      ctx.moveTo(vpX - 34, vpY - 12);
+      ctx.lineTo(vpX - 34, vpY + 8);
+      ctx.stroke();
+
+      // 2. Polished Dark Marble Floor & Converging Plush Red Carpet
+      ctx.fillStyle = '#2d0c1c';
+      ctx.beginPath();
+      ctx.moveTo(0, h * 0.66);
+      ctx.lineTo(vpX - 45, vpY + 6);
+      ctx.lineTo(vpX + 45, vpY + 6);
+      ctx.lineTo(w, h * 0.66);
+      ctx.lineTo(w, h);
+      ctx.lineTo(0, h);
+      ctx.closePath();
+      ctx.fill();
+
+      // Plush Crimson Red Carpet with Gold Borders
+      const carpetGrad = ctx.createLinearGradient(0, vpY, 0, h);
+      carpetGrad.addColorStop(0, '#9f1239');
+      carpetGrad.addColorStop(0.5, '#be123c');
+      carpetGrad.addColorStop(1, '#e11d48');
+      ctx.fillStyle = carpetGrad;
+      ctx.beginPath();
+      ctx.moveTo(vpX - 24, vpY + 6);
+      ctx.lineTo(vpX + 24, vpY + 6);
+      ctx.lineTo(w * 0.84, h);
+      ctx.lineTo(w * 0.16, h);
+      ctx.closePath();
+      ctx.fill();
+
+      // Gold trim edges on Red Carpet
+      ctx.strokeStyle = '#fde047';
+      ctx.lineWidth = 3.5;
+      ctx.beginPath();
+      ctx.moveTo(vpX - 24, vpY + 6);
+      ctx.lineTo(w * 0.16, h);
+      ctx.moveTo(vpX + 24, vpY + 6);
+      ctx.lineTo(w * 0.84, h);
+      ctx.stroke();
+
+      // 3. Passing Gold Stanchions, Velvet Ropes & Candlelit Dining Tables
+      for (let i = 0; i < 4; i++) {
+        const rawT = (i + scroll) / 4;
+        const t = Math.pow(rawT, 2.05);
+        const yPos = (vpY + 6) + t * (h * 0.92 - (vpY + 6));
+        const leftCarpetX = (vpX - 26) + t * (w * 0.12 - (vpX - 26));
+        const rightCarpetX = (vpX + 26) + t * (w * 0.88 - (vpX + 26));
+        const scale = 0.16 + t * 1.15;
+
+        // Left & Right Gold Stanchion Posts along Red Carpet
+        [leftCarpetX, rightCarpetX].forEach((sx) => {
+          ctx.save();
+          ctx.translate(sx, yPos);
+          ctx.scale(scale, scale);
+          ctx.fillStyle = '#fbbf24';
+          ctx.fillRect(-3, -46, 6, 46);
+          ctx.beginPath();
+          ctx.arc(0, -48, 5.5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        });
+
+        // Warm bokeh / candlelights in luxury restaurant hall on sides
+        ctx.fillStyle = `rgba(253, 224, 71, ${0.25 + t * 0.5})`;
+        ctx.beginPath();
+        ctx.arc(leftCarpetX - 28 * scale, yPos - 38 * scale, 4 * scale, 0, Math.PI * 2);
+        ctx.arc(rightCarpetX + 28 * scale, yPos - 38 * scale, 4 * scale, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // ------------------- FORWARD-WALKING GEN Z FASHION MODEL -------------------
+
+    function drawFashionCharacter(w, h, beatPhase, elapsedSec) {
+      const scene = state.scene;
+      const outfit = state.outfit;
+
+      // Walking cycle synced smoothly to 110 BPM (1 step per beat)
+      const stepAngle = beatPhase * Math.PI; // alternates +1 and -1 each beat
+      const stride = Math.sin(stepAngle); // Left vs Right leg forward/back
+      const doubleBounce = Math.abs(Math.cos(stepAngle)); // Vertical bob twice per 2-step cycle
+
+      // Subtle catwalk hip sway & opposite shoulder counter-twist
+      let hipX = stride * 7.5;
+      let bodyBobY = -doubleBounce * 6.5;
+      let torsoTilt = stride * 0.042;
+      let headTilt = -stride * 0.035;
+
+      // Natural opposite arm swing while walking forward
+      let leftArmAngle = -0.22 - stride * 0.34;
+      let rightArmAngle = 0.22 - stride * 0.34;
+      let leftForearmAngle = -0.25 - Math.max(0, -stride) * 0.25;
+      let rightForearmAngle = 0.25 + Math.max(0, stride) * 0.25;
+
+      if (scene === 'gala') {
+        // Poised red-carpet runway walk (confident posture, refined arm glide)
+        hipX = stride * 9.5;
+        bodyBobY = -doubleBounce * 5.5;
+        torsoTilt = stride * 0.05;
+        leftArmAngle = -0.24 - stride * 0.26;
+        rightArmAngle = 0.24 - stride * 0.26;
+      } else if (scene === 'beach') {
+        // Breezy relaxed seaside walk
+        hipX = stride * 8.5;
+        leftArmAngle = -0.28 - stride * 0.38;
+        rightArmAngle = 0.28 - stride * 0.38;
+      }
+
+      // Base anchor stays centered in frame while world scrolls past
+      const scaleFactor = Math.min(w / 390, h / 760) * 1.04;
+      const baseX = w * 0.5 + hipX;
+      const baseY = h * 0.76;
+
+      ctx.save();
+      ctx.translate(baseX, baseY);
+      ctx.scale(scaleFactor, scaleFactor);
+
+      // Soft ground shadow under walking feet
+      ctx.fillStyle = 'rgba(30, 20, 25, 0.18)';
+      ctx.beginPath();
+      ctx.ellipse(0, 5, 44 - doubleBounce * 4, 8.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Skin tone palette
+      const skinFill = '#fde2d2';
+
+      // --- WALKING LEGS & FOOTWEAR (Alternating Forward/Backward Stride) ---
+      const leftStep = stride; // > 0 means stepping forward, < 0 means back
+      const rightStep = -stride;
+
+      const drawSingleLeg = (sideX, stepVal) => {
+        const isForward = stepVal > 0;
+        const legScale = 1 + stepVal * 0.055; // Slight perspective foreshortening as foot steps forward
+        const footLiftY = isForward ? -Math.sin(stepVal * Math.PI) * 10 : stepVal * 7;
+        const hipShiftX = sideX * (1 + stepVal * 0.08);
+
+        ctx.save();
+        ctx.translate(hipShiftX, -135 + bodyBobY * 0.7);
+        ctx.scale(legScale, legScale);
+        ctx.rotate(-stepVal * 0.05);
+
+        ctx.fillStyle = skinFill;
+        ctx.beginPath();
+        ctx.roundRect(-8, 0, 16, 126 + footLiftY, 8);
+        ctx.fill();
+
+        drawFootwear(ctx, 0, 124 + footLiftY, outfit);
+        ctx.restore();
+      };
+
+      // Draw back leg first, then front leg for natural 3D overlap!
+      if (leftStep < rightStep) {
+        drawSingleLeg(-14, leftStep);
+        drawSingleLeg(14, rightStep);
+      } else {
+        drawSingleLeg(14, rightStep);
+        drawSingleLeg(-14, leftStep);
+      }
+
+      // --- BACK HAIR LAYER (Driven by Scene Hair Style!) ---
+      ctx.save();
+      ctx.translate(0, -245 + bodyBobY);
+      ctx.rotate(torsoTilt * 0.6);
+      drawBackHair(ctx, scene, stride, doubleBounce);
+      ctx.restore();
+
+      // --- TORSO & OUTFIT ---
+      ctx.save();
+      ctx.translate(0, -142 + bodyBobY);
+      ctx.rotate(torsoTilt);
+
+      ctx.fillStyle = skinFill;
+      ctx.fillRect(-7, -118, 14, 22);
+      ctx.beginPath();
+      ctx.moveTo(-24, -96);
+      ctx.quadraticCurveTo(0, -102, 24, -96);
+      ctx.lineTo(18, -46);
+      ctx.lineTo(22, 4);
+      ctx.lineTo(-22, 4);
+      ctx.lineTo(-18, -46);
+      ctx.closePath();
+      ctx.fill();
+
+      drawOutfitGarment(ctx, outfit, stride, doubleBounce);
+
+      // --- ARMS & ACCESSORIES ---
+      ctx.save();
+      ctx.translate(-25, -90);
+      ctx.rotate(leftArmAngle);
+      drawArm(ctx, skinFill, outfit, true, leftForearmAngle);
+      ctx.restore();
+
+      ctx.save();
+      ctx.translate(25, -90);
+      ctx.rotate(rightArmAngle);
+      drawArm(ctx, skinFill, outfit, false, rightForearmAngle);
+      ctx.restore();
+
+      // --- HEAD & SCENE-SPECIFIC MAKEUP + HAIR ---
+      ctx.save();
+      ctx.translate(0, -118);
+      ctx.rotate(headTilt);
+
+      // Face oval
+      ctx.fillStyle = skinFill;
+      ctx.beginPath();
+      ctx.moveTo(-22, -34);
+      ctx.quadraticCurveTo(-24, -8, 0, 0);
+      ctx.quadraticCurveTo(24, -8, 22, -34);
+      ctx.quadraticCurveTo(22, -56, 0, -56);
+      ctx.quadraticCurveTo(-22, -56, -22, -34);
+      ctx.fill();
+
+      // Scene-specific Makeup & Hair Styling
+      drawFaceMakeupAndFeatures(ctx, scene, elapsedSec);
+      drawFrontHair(ctx, scene);
+
+      ctx.restore(); // End Head
+      ctx.restore(); // End Torso
+      ctx.restore(); // End Character Root
+    }
+
+    function drawFaceMakeupAndFeatures(ctx, scene, elapsedSec) {
+      // Blinking animation every ~3.4 seconds
+      const blinkCycle = elapsedSec % 3.4;
+      const isBlinking = blinkCycle > 3.25;
+
+      // 1. Blush & Contour per Scene
+      if (scene === 'beach') {
+        // Trang điểm tự nhiên (Natural sun-kissed peach glow)
+        ctx.fillStyle = 'rgba(253, 164, 175, 0.22)';
+        ctx.beginPath();
+        ctx.ellipse(-12, -18, 6, 3.2, 0, 0, Math.PI * 2);
+        ctx.ellipse(12, -18, 6, 3.2, 0, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (scene === 'cafe') {
+        // Trang điểm nhẹ nhàng (Fresh rosy Korean street look)
+        ctx.fillStyle = 'rgba(244, 114, 182, 0.30)';
+        ctx.beginPath();
+        ctx.ellipse(-12, -18, 5.8, 3.2, 0, 0, Math.PI * 2);
+        ctx.ellipse(12, -18, 5.8, 3.2, 0, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (scene === 'gala') {
+        // Trang điểm đậm, sắc sảo (Glamorous evening contour, shimmer eyeshadow & bold crimson lips)
+        // Warm smoky-rose eyeshadow
+        ctx.fillStyle = 'rgba(159, 18, 57, 0.26)';
+        ctx.beginPath();
+        ctx.ellipse(-9.5, -26.5, 5.5, 3, 0, 0, Math.PI * 2);
+        ctx.ellipse(9.5, -26.5, 5.5, 3, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Sculpted rose-terracotta cheek contour
+        ctx.fillStyle = 'rgba(225, 29, 72, 0.32)';
+        ctx.beginPath();
+        ctx.ellipse(-13.5, -17.5, 6.5, 2.6, -0.25, 0, Math.PI * 2);
+        ctx.ellipse(13.5, -17.5, 6.5, 2.6, 0.25, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        // Ở nhà: Fresh natural skin
+        ctx.fillStyle = 'rgba(251, 113, 133, 0.20)';
+        ctx.beginPath();
+        ctx.ellipse(-12, -18, 5, 2.8, 0, 0, Math.PI * 2);
+        ctx.ellipse(12, -18, 5, 2.8, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // 2. Eyes & Eyeliner
+      [-9.5, 9.5].forEach((ex, idx) => {
+        const dir = idx === 0 ? -1 : 1;
+        if (isBlinking) {
+          ctx.strokeStyle = '#3f2e2b';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(ex, -25, 4, 0.1 * Math.PI, 0.9 * Math.PI);
+          ctx.stroke();
+        } else {
+          // Sharp winged eyeliner for Gala!
+          if (scene === 'gala') {
+            ctx.strokeStyle = '#18181b';
+            ctx.lineWidth = 1.9;
+            ctx.beginPath();
+            ctx.moveTo(ex - dir * 3.5, -26.5);
+            ctx.quadraticCurveTo(ex, -29, ex + dir * 6.2, -28.5);
+            ctx.stroke();
+          } else if (scene === 'cafe') {
+            // Soft brown puppy liner
+            ctx.strokeStyle = '#57534e';
+            ctx.lineWidth = 1.3;
+            ctx.beginPath();
+            ctx.moveTo(ex - dir * 3, -26.5);
+            ctx.lineTo(ex + dir * 4.5, -26);
+            ctx.stroke();
+          }
+
+          ctx.fillStyle = '#2b1d1a';
+          ctx.beginPath();
+          ctx.ellipse(ex, -25, 3.3, 4.1, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Eye catchlight
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(ex - 1, -26.5, 1.3, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+
+      // 3. Eyebrows (Sharper arched brow for Gala, softer for Beach/Cafe)
+      ctx.strokeStyle = scene === 'gala' ? '#292524' : '#57433e';
+      ctx.lineWidth = scene === 'gala' ? 1.8 : 1.4;
+      ctx.beginPath();
+      ctx.moveTo(-14, -32);
+      ctx.quadraticCurveTo(-9.5, scene === 'gala' ? -35.8 : -34.2, -5.5, -32.5);
+      ctx.moveTo(5.5, -32.5);
+      ctx.quadraticCurveTo(9.5, scene === 'gala' ? -35.8 : -34.2, 14, -32);
+      ctx.stroke();
+
+      // 4. Lips (Natural peach for Beach, Soft rose for Cafe, Bold Velvet Red for Gala)
+      if (scene === 'beach') {
+        ctx.fillStyle = '#fb7185';
+      } else if (scene === 'cafe') {
+        ctx.fillStyle = '#f43f5e';
+      } else if (scene === 'gala') {
+        ctx.fillStyle = '#9f1239'; // Deep rich crimson lipstick
+      } else {
+        ctx.fillStyle = '#fda4af';
+      }
+
+      ctx.beginPath();
+      ctx.arc(0, -13, scene === 'gala' ? 6 : 5.3, 0.06 * Math.PI, 0.94 * Math.PI);
+      ctx.closePath();
+      ctx.fill();
+
+      // Cute glasses when at home in pajamas
+      if (scene === 'bedroom' && state.outfit === 'pajama') {
+        ctx.strokeStyle = '#292524';
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        ctx.arc(-9.5, -24.5, 6.8, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(9.5, -24.5, 6.8, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(-2.7, -24.5);
+        ctx.lineTo(2.7, -24.5);
+        ctx.stroke();
+      }
+    }
+
+    function drawFootwear(ctx, x, y, outfit) {
+      ctx.save();
+      ctx.translate(x, y);
+      if (outfit === 'pajama') {
+        // Cute fluffy pastel house slippers
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.ellipse(0, 4, 11, 6, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#bae6fd';
+        ctx.beginPath();
+        ctx.arc(0, 2, 7, Math.PI, 0);
+        ctx.fill();
+      } else if (outfit === 'cream') {
+        // Champagne nude pointed-toe heels
+        ctx.fillStyle = '#f3d5b5';
+        ctx.beginPath();
+        ctx.moveTo(-6, 0);
+        ctx.lineTo(6, 0);
+        ctx.lineTo(8, 12);
+        ctx.lineTo(-8, 12);
+        ctx.closePath();
+        ctx.fill();
+      } else if (outfit === 'tweed') {
+        // Chic white & black cap-toe slingbacks
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.roundRect(-7, 0, 14, 11, 4);
+        ctx.fill();
+        ctx.fillStyle = '#18181b';
+        ctx.beginPath();
+        ctx.roundRect(-6, 6, 12, 5, 3);
+        ctx.fill();
+      } else {
+        // Classic glossy black stiletto heels
+        ctx.fillStyle = '#18181b';
+        ctx.beginPath();
+        ctx.moveTo(-6, 0);
+        ctx.lineTo(6, 0);
+        ctx.lineTo(8, 13);
+        ctx.lineTo(-8, 13);
+        ctx.closePath();
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    function drawBackHair(ctx, scene, stride, doubleBounce) {
+      ctx.fillStyle = '#241816';
+      if (scene === 'bedroom') {
+        // Cute side braid over shoulder at home
+        ctx.beginPath();
+        ctx.arc(0, -18, 25, 0, Math.PI * 2);
+        ctx.fill();
+        const braidSwing = stride * 4.5;
+        for (let i = 0; i < 5; i++) {
+          ctx.beginPath();
+          ctx.arc(-18 + braidSwing * (i * 0.25), 4 + i * 11, 6.5 - i * 0.4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.fillStyle = '#7dd3fc';
+        ctx.beginPath();
+        ctx.arc(-18 + braidSwing, 54, 4, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (scene === 'beach') {
+        // Đi biển: Búi tóc cao gọn gàng năng động (Chic high bun updo)
+        ctx.beginPath();
+        ctx.arc(0, -49 - doubleBounce * 1.2, 14.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(0, -22, 24, 0, Math.PI * 2);
+        ctx.fill();
+        // Cute scrunchie / hair tie accent
+        ctx.strokeStyle = '#fef08a';
+        ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        ctx.arc(0, -39 - doubleBounce * 1.2, 9, 0.1 * Math.PI, 0.9 * Math.PI);
+        ctx.stroke();
+      } else if (scene === 'cafe') {
+        // Đi phố / Hẻm: Tóc ngang vai trẻ trung (Sleek shoulder-length hair)
+        ctx.beginPath();
+        ctx.moveTo(-24, -28);
+        ctx.quadraticCurveTo(-33 + stride * 3.5, 14, -25 + stride * 5, 36);
+        ctx.lineTo(25 + stride * 5, 36);
+        ctx.quadraticCurveTo(33 + stride * 3.5, 14, 24, -28);
+        ctx.closePath();
+        ctx.fill();
+      } else if (scene === 'gala') {
+        // Đi tiệc / Thảm đỏ: Xoã tóc dài bồng bềnh quyến rũ (Long voluminous wavy curls)
+        ctx.beginPath();
+        ctx.moveTo(-24, -28);
+        ctx.bezierCurveTo(-40, 12, -34 + stride * 6.5, 50, -26 + stride * 8.5, 84);
+        ctx.lineTo(26 + stride * 8.5, 84);
+        ctx.bezierCurveTo(34 + stride * 6.5, 50, 40, 12, 24, -28);
+        ctx.closePath();
+        ctx.fill();
+      }
+    }
+
+    function drawFrontHair(ctx, scene) {
+      ctx.fillStyle = '#241816';
+
+      if (scene === 'cafe') {
+        // Đi phố: Để mái lưa thưa trẻ trung (Wispy Korean see-through bangs)
+        ctx.beginPath();
+        ctx.moveTo(-22, -34);
+        ctx.quadraticCurveTo(-22, -58, 0, -58);
+        ctx.quadraticCurveTo(22, -58, 22, -34);
+        ctx.lineTo(13, -33);
+        ctx.lineTo(8, -42);
+        ctx.lineTo(4, -32);
+        ctx.lineTo(0, -43);
+        ctx.lineTo(-4, -32);
+        ctx.lineTo(-9, -42);
+        ctx.lineTo(-14, -33);
+        ctx.closePath();
+        ctx.fill();
+
+        // Cute pastel hairclip
+        ctx.fillStyle = '#f472b6';
+        ctx.beginPath();
+        ctx.ellipse(15, -45, 5, 2.8, -0.3, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (scene === 'beach') {
+        // Đi biển: Búi tóc gọn, rẽ ngôi tự nhiên không mái dày
+        ctx.beginPath();
+        ctx.moveTo(-22, -32);
+        ctx.quadraticCurveTo(-22, -58, 0, -58);
+        ctx.quadraticCurveTo(22, -58, 22, -32);
+        ctx.quadraticCurveTo(12, -48, 0, -44);
+        ctx.quadraticCurveTo(-12, -48, -22, -32);
+        ctx.fill();
+
+        // Gold hoop earrings
+        ctx.strokeStyle = '#fbbf24';
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        ctx.arc(-22, -14, 3.2, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(22, -14, 3.2, 0, Math.PI * 2);
+        ctx.stroke();
+      } else if (scene === 'gala') {
+        // Đi tiệc: Tóc xoã rẽ ngôi lệch quyến rũ + khuyên tai kim cương lấp lánh
+        ctx.beginPath();
+        ctx.moveTo(-22, -30);
+        ctx.quadraticCurveTo(-22, -58, 0, -58);
+        ctx.quadraticCurveTo(22, -58, 22, -30);
+        ctx.quadraticCurveTo(10, -50, -5, -45);
+        ctx.quadraticCurveTo(-15, -44, -22, -30);
+        ctx.fill();
+
+        // Sparkling diamond drop earrings
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(-22, -13, 3.2, 0, Math.PI * 2);
+        ctx.arc(22, -13, 3.2, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        // Ở nhà: Mái mềm tự nhiên
+        ctx.beginPath();
+        ctx.moveTo(-22, -34);
+        ctx.quadraticCurveTo(-22, -58, 0, -58);
+        ctx.quadraticCurveTo(22, -58, 22, -34);
+        ctx.quadraticCurveTo(14, -44, 4, -37);
+        ctx.quadraticCurveTo(0, -45, -5, -37);
+        ctx.quadraticCurveTo(-14, -44, -22, -34);
+        ctx.fill();
+      }
+    }
+
+    function drawArm(ctx, skinFill, outfit, isLeft, forearmAngle) {
+      // Sleeve / Upper Arm
+      ctx.fillStyle = skinFill;
+      ctx.beginPath();
+      ctx.roundRect(-5.5, 0, 11, 44, 5.5);
+      ctx.fill();
+
+      // Outfit-specific sleeve detail
+      if (outfit === 'pajama') {
+        ctx.fillStyle = '#e0f2fe';
+        ctx.beginPath();
+        ctx.roundRect(-7, -2, 14, 24, 5);
+        ctx.fill();
+        ctx.strokeStyle = '#7dd3fc';
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+      } else if (outfit === 'tweed') {
+        ctx.fillStyle = '#fbcfe8';
+        ctx.beginPath();
+        ctx.roundRect(-7, -2, 14, 40, 5);
+        ctx.fill();
+      } else if (outfit === 'red') {
+        // Off-shoulder strap band
+        ctx.fillStyle = '#9f1239';
+        ctx.beginPath();
+        ctx.roundRect(-6.5, 6, 13, 8, 3);
+        ctx.fill();
+      }
+
+      // Forearm & Hand
+      ctx.save();
+      ctx.translate(0, 41);
+      ctx.rotate(forearmAngle);
+      ctx.fillStyle = skinFill;
+      ctx.beginPath();
+      ctx.roundRect(-4.5, 0, 9, 40, 4.5);
+      ctx.fill();
+
+      // Mini designer bag held on arm/hand for fashion sets!
+      if (isLeft && outfit === 'cream') {
+        // Cream mini shoulder bag
+        ctx.fillStyle = '#fffbeb';
+        ctx.strokeStyle = '#d97706';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(-12, 26, 22, 16, 5);
+        ctx.fill();
+        ctx.stroke();
+      } else if (!isLeft && outfit === 'red') {
+        // Metallic gold/black evening clutch
+        ctx.fillStyle = '#18181b';
+        ctx.strokeStyle = '#fbbf24';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(-10, 32, 22, 13, 4);
+        ctx.fill();
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawOutfitGarment(ctx, outfit, swayWave, beatBounce) {
+      const skirtFlow = swayWave * 5;
+
+      if (outfit === 'pajama') {
+        // Cute pastel blue-white checkered silk pajama set (inspired by Fig 1.1)
+        ctx.fillStyle = '#e0f2fe';
+        ctx.beginPath();
+        ctx.roundRect(-22, -94, 44, 54, 8);
+        ctx.fill();
+
+        // Subtle gingham check lines
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.28)';
+        ctx.lineWidth = 1.5;
+        for (let x = -16; x <= 16; x += 8) {
+          ctx.beginPath();
+          ctx.moveTo(x, -92);
+          ctx.lineTo(x, -42);
+          ctx.stroke();
+        }
+        for (let y = -86; y <= -46; y += 8) {
+          ctx.beginPath();
+          ctx.moveTo(-20, y);
+          ctx.lineTo(20, y);
+          ctx.stroke();
+        }
+
+        // White lapel collar & buttons
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(-8, -94);
+        ctx.lineTo(0, -78);
+        ctx.lineTo(8, -94);
+        ctx.stroke();
+
+        // Matching pajama shorts with white ribbon bow
+        ctx.fillStyle = '#bae6fd';
+        ctx.beginPath();
+        ctx.moveTo(-20, -42);
+        ctx.lineTo(20, -42);
+        ctx.lineTo(24 + skirtFlow * 0.4, -8);
+        ctx.lineTo(2, -8);
+        ctx.lineTo(0, -18);
+        ctx.lineTo(-2, -8);
+        ctx.lineTo(-24 + skirtFlow * 0.4, -8);
+        ctx.closePath();
+        ctx.fill();
+
+        // White satin waist bow
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.ellipse(-4, -39, 4.5, 2.5, -0.2, 0, Math.PI * 2);
+        ctx.ellipse(4, -39, 4.5, 2.5, 0.2, 0, Math.PI * 2);
+        ctx.fill();
+
+      } else if (outfit === 'cream') {
+        // SET 1: Cream Satin Strapless Midi Dress + Pearl Necklace + Draped Waist Bow
+        // Pearl necklace
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(0, -94, 11, 0.15 * Math.PI, 0.85 * Math.PI);
+        ctx.stroke();
+
+        // Satin cream bodice & flowing midi A-line skirt
+        const dressGrad = ctx.createLinearGradient(-25, -80, 25, 85);
+        dressGrad.addColorStop(0, '#fffbeb');
+        dressGrad.addColorStop(0.5, '#fef3c7');
+        dressGrad.addColorStop(1, '#fde68a');
+        ctx.fillStyle = dressGrad;
+
+        ctx.beginPath();
+        ctx.moveTo(-19, -78);
+        ctx.quadraticCurveTo(0, -75, 19, -78);
+        ctx.lineTo(16, -44);
+        ctx.quadraticCurveTo(34 + skirtFlow, 22, 38 + skirtFlow * 1.4, 82);
+        ctx.lineTo(-38 + skirtFlow * 1.4, 82);
+        ctx.quadraticCurveTo(-34 + skirtFlow, 22, -16, -44);
+        ctx.closePath();
+        ctx.fill();
+
+        // Satin draped waist sash & bow detail
+        ctx.strokeStyle = '#f59e0b';
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.moveTo(-16, -44);
+        ctx.quadraticCurveTo(0, -40, 16, -44);
+        ctx.stroke();
+
+        ctx.fillStyle = '#fffbeb';
+        ctx.beginPath();
+        ctx.ellipse(9, -41, 6, 3.5, 0.25, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+      } else if (outfit === 'tweed') {
+        // SET 2: Pastel Pink Tweed Cropped Blazer + White Top + Pleated Mini Skirt
+        // White inner crop top
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(-15, -88, 30, 42);
+
+        // Pastel tweed cropped jacket panels
+        ctx.fillStyle = '#fbcfe8';
+        ctx.beginPath();
+        ctx.roundRect(-23, -95, 18, 46, 5);
+        ctx.roundRect(5, -95, 18, 46, 5);
+        ctx.fill();
+
+        // Gold tweed buttons
+        ctx.fillStyle = '#fbbf24';
+        [-80, -68, -56].forEach((by) => {
+          ctx.beginPath();
+          ctx.arc(-9, by, 2, 0, Math.PI * 2);
+          ctx.arc(9, by, 2, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        // Pleated high-waisted mini skirt
+        ctx.fillStyle = '#fff1f2';
+        ctx.beginPath();
+        ctx.moveTo(-18, -46);
+        ctx.lineTo(18, -46);
+        ctx.lineTo(32 + skirtFlow, 14);
+        ctx.lineTo(-32 + skirtFlow, 14);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = '#f472b6';
+        ctx.lineWidth = 1.4;
+        ctx.stroke();
+
+        // Pleat lines
+        for (let p = -12; p <= 12; p += 6) {
+          ctx.beginPath();
+          ctx.moveTo(p, -45);
+          ctx.lineTo(p * 1.6 + skirtFlow * 0.8, 13);
+          ctx.stroke();
+        }
+
+        // Chic designer waist belt
+        ctx.fillStyle = '#be185d';
+        ctx.fillRect(-18, -47, 36, 5);
+        ctx.fillStyle = '#fde047';
+        ctx.fillRect(-4, -48, 8, 7);
+
+      } else if (outfit === 'red') {
+        // SET 3: Glamorous Burgundy Off-Shoulder Evening Mermaid/Midi Dress
+        const redGrad = ctx.createLinearGradient(-22, -82, 22, 95);
+        redGrad.addColorStop(0, '#be123c');
+        redGrad.addColorStop(0.5, '#9f1239');
+        redGrad.addColorStop(1, '#881337');
+        ctx.fillStyle = redGrad;
+
+        // Sweetheart off-shoulder bodice + sleek mermaid silhouette
+        ctx.beginPath();
+        ctx.moveTo(-21, -80);
+        ctx.quadraticCurveTo(-10, -85, 0, -78);
+        ctx.quadraticCurveTo(10, -85, 21, -80);
+        ctx.lineTo(16, -44);
+        ctx.quadraticCurveTo(25, 10, 22, 54);
+        ctx.lineTo(31 + skirtFlow, 92);
+        ctx.lineTo(-31 + skirtFlow, 92);
+        ctx.lineTo(-22, 54);
+        ctx.quadraticCurveTo(-25, 10, -16, -44);
+        ctx.closePath();
+        ctx.fill();
+
+        // Silk highlight sheen
+        ctx.strokeStyle = 'rgba(255, 228, 230, 0.35)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(-8, -68);
+        ctx.quadraticCurveTo(-11, 0, -12 + skirtFlow * 0.5, 84);
+        ctx.stroke();
+
+        // Sparkling crystal brooch on bodice
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(10, -68, 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // ------------------- MAIN ANIMATION LOOP -------------------
+
+    function animate(now) {
+      const rect = viewportEl.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+
+      const elapsedSec = (now - state.startTime) / 1000;
+      const beatPhase = elapsedSec * (state.bpm / 60); // 1.0 unit = 1 step at 110 BPM
+      const walkPhase = beatPhase * 0.55; // Smooth continuous forward ground speed
+
+      // Smoothly interpolate zoom & pan (silky-smooth curve for both mouse & touch)
+      const lerpSpeed = state.isPinching || state.isDragging ? 0.32 : 0.20;
+      state.zoom += (state.targetZoom - state.zoom) * lerpSpeed;
+      state.panX += (state.targetPanX - state.panX) * lerpSpeed;
+      state.panY += (state.targetPanY - state.panY) * lerpSpeed;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Apply camera transform (Zoom & Pan to inspect outfit details)
+      ctx.save();
+      ctx.translate(w * 0.5 + state.panX, h * 0.48 + state.panY);
+      ctx.scale(state.zoom, state.zoom);
+      ctx.translate(-w * 0.5, -h * 0.48);
+
+      // 1. Render Active Forward-Scrolling Perspective Scene
+      if (state.scene === 'bedroom') {
+        drawBedroomScene(w, h, walkPhase);
+      } else if (state.scene === 'beach') {
+        drawBeachScene(w, h, walkPhase);
+      } else if (state.scene === 'cafe') {
+        drawCafeScene(w, h, walkPhase);
+      } else if (state.scene === 'gala') {
+        drawGalaScene(w, h, walkPhase);
+      }
+
+      // 2. Render Center Forward-Walking Gen Z Model
+      drawFashionCharacter(w, h, beatPhase, elapsedSec);
+
+      ctx.restore();
+
+      // 3. Render Sparkle Transition Particles (Screen Space)
+      for (let i = state.particles.length - 1; i >= 0; i--) {
+        const p = state.particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.06; // Gentle gravity
+        p.alpha -= 0.024;
+        if (p.alpha <= 0) {
+          state.particles.splice(i, 1);
+          continue;
+        }
+        if (p.shape === 'star') {
+          drawStar(ctx, p.x, p.y, p.size, p.color, p.alpha);
+        } else {
+          ctx.save();
+          ctx.globalAlpha = p.alpha;
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size * 0.65, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      // 4. Subtle Soft Flash Overlay on Outfit/Scene Switch
+      if (state.transitionFlash > 0.01) {
+        ctx.fillStyle = `rgba(255, 255, 255, ${state.transitionFlash * 0.35})`;
+        ctx.fillRect(0, 0, w, h);
+        state.transitionFlash *= 0.86;
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    /**
+     * ============================================================================
+     * 5. INTERACTIVE CONTROLS: OUTFITS, SCENES, VPE POPUP & SIMULATED CHECKOUT
+     * ============================================================================
+     */
+    const vpePopup = document.getElementById('vpePopup');
+    const topStatusBar = document.getElementById('topStatusBar');
+    const currentContextLabel = document.getElementById('currentContextLabel');
+    const orderToast = document.getElementById('orderToast');
+    const orderToastDetail = document.getElementById('orderToastDetail');
+    let toastTimeout = null;
+
+    function updateStatusBadge() {
+      const sceneName = SCENE_DATA[state.scene].label;
+      const outfitName = OUTFIT_DATA[state.outfit].shortName;
+      currentContextLabel.textContent = `${sceneName} • ${outfitName}`;
+    }
+
+    function showVpePopup(outfitKey) {
+      const data = OUTFIT_DATA[outfitKey];
+      if (!data || outfitKey === 'pajama') {
+        hideVpePopup();
+        return;
+      }
+
+      document.getElementById('vpeThumb').innerHTML = data.svgIcon;
+      document.getElementById('vpeDiscountBadge').textContent = data.discount;
+      document.getElementById('vpeTitle').textContent = data.title;
+      document.getElementById('vpeSalePrice').textContent = data.salePrice;
+      document.getElementById('vpeOrigPrice').textContent = data.origPrice;
+
+      vpePopup.classList.add('is-visible');
+      topStatusBar.style.opacity = '0';
+      topStatusBar.style.pointerEvents = 'none';
+    }
+
+    function hideVpePopup() {
+      vpePopup.classList.remove('is-visible');
+      topStatusBar.style.opacity = '1';
+      topStatusBar.style.pointerEvents = 'auto';
+    }
+
+    function selectOutfit(outfitKey) {
+      beatEngine.start();
+      beatEngine.playChime();
+
+      state.outfit = outfitKey;
+      // If user is still in initial bedroom and picks a fashion outfit, auto-transition to Chic Café if not yet chosen
+      if (outfitKey !== 'pajama' && state.scene === 'bedroom') {
+        selectScene('cafe', false);
+      }
+
+      // Update active button styling
+      document.querySelectorAll('.outfit-btn').forEach((btn) => {
+        btn.classList.toggle('active-outfit', btn.dataset.outfit === outfitKey);
+      });
+
+      spawnTransitionParticles(OUTFIT_DATA[outfitKey].accent);
+      updateStatusBadge();
+
+      if (outfitKey === 'pajama') {
+        hideVpePopup();
+      } else {
+        showVpePopup(outfitKey);
+      }
+    }
+
+    function selectScene(sceneKey, playFeedback = true) {
+      beatEngine.start();
+      if (playFeedback) beatEngine.playChime();
+
+      state.scene = sceneKey;
+
+      // Update active scene button styling
+      document.querySelectorAll('.scene-btn').forEach((btn) => {
+        btn.classList.toggle('active-scene', btn.dataset.scene === sceneKey);
+      });
+
+      if (playFeedback) {
+        const sceneColors = { beach: '#38bdf8', cafe: '#fb7185', gala: '#fbbf24', bedroom: '#a7f3d0' };
+        spawnTransitionParticles(sceneColors[sceneKey] || '#fbbf24');
+      }
+      updateStatusBadge();
+    }
+
+    // Bind Outfit Buttons
+    document.querySelectorAll('.outfit-btn').forEach((btn) => {
+      btn.addEventListener('click', () => selectOutfit(btn.dataset.outfit));
+    });
+
+    // Reset to Pajamas & Home Bedroom button
+    document.getElementById('resetPajamaBtn').addEventListener('click', () => {
+      selectScene('bedroom', false);
+      selectOutfit('pajama');
+    });
+
+    // Bind Scene Buttons
+    document.querySelectorAll('.scene-btn').forEach((btn) => {
+      btn.addEventListener('click', () => selectScene(btn.dataset.scene, true));
+    });
+
+    // Close VPE Popup button
+    document.getElementById('closeVpeBtn').addEventListener('click', () => {
+      hideVpePopup();
+    });
+
+    // Simulated Checkout CTA ("CHỐT ĐƠN NGAY")
+    document.getElementById('checkoutBtn').addEventListener('click', () => {
+      beatEngine.playChime();
+      const data = OUTFIT_DATA[state.outfit];
+      orderToastDetail.textContent = `Giữ ưu đãi ${data.salePrice} thành công`;
+
+      orderToast.classList.add('is-visible');
+      spawnTransitionParticles('#10b981');
+
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        orderToast.classList.remove('is-visible');
+      }, 2600);
+    });
+
+    // Audio Toggle Button
+    document.getElementById('audioToggleBtn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      beatEngine.toggle();
+    });
+
+    /**
+     * ============================================================================
+     * 6. ZOOM & PAN GESTURES (MOUSE WHEEL, CLICK-DRAG & MOBILE PINCH-ZOOM)
+     * ============================================================================
+     */
+    const resetZoomBtn = document.getElementById('resetZoomBtn');
+    const zoomLevelText = document.getElementById('zoomLevelText');
+    const zoomHintBadge = document.getElementById('zoomHintBadge');
+
+    function clampPan() {
+      const rect = viewportEl.getBoundingClientRect();
+      const maxPanX = (rect.width * (state.targetZoom - 1)) * 0.55;
+      const maxPanY = (rect.height * (state.targetZoom - 1)) * 0.55;
+      state.targetPanX = Math.max(-maxPanX, Math.min(maxPanX, state.targetPanX));
+      state.targetPanY = Math.max(-maxPanY, Math.min(maxPanY, state.targetPanY));
+    }
+
+    function updateZoomUI() {
+      if (state.targetZoom > 1.05) {
+        resetZoomBtn.classList.remove('hidden');
+        zoomLevelText.textContent = `1x (${state.targetZoom.toFixed(1)}x)`;
+        zoomHintBadge.classList.add('opacity-0');
+      } else {
+        resetZoomBtn.classList.add('hidden');
+        zoomHintBadge.classList.remove('opacity-0');
+      }
+    }
+
+    function resetCamera() {
+      state.targetZoom = 1;
+      state.targetPanX = 0;
+      state.targetPanY = 0;
+      updateZoomUI();
+    }
+
+    resetZoomBtn.addEventListener('click', resetCamera);
+
+    // PC: Mouse Wheel Zoom
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      beatEngine.start();
+      const delta = -e.deltaY * 0.0018;
+      state.targetZoom = Math.max(1, Math.min(2.8, state.targetZoom + delta));
+      if (state.targetZoom <= 1.02) {
+        state.targetZoom = 1;
+        state.targetPanX = 0;
+        state.targetPanY = 0;
+      } else {
+        clampPan();
+      }
+      updateZoomUI();
+    }, { passive: false });
+
+    // PC: Click & Drag Pan
+    canvas.addEventListener('mousedown', (e) => {
+      beatEngine.start();
+      if (state.targetZoom <= 1.02) return;
+      state.isDragging = true;
+      state.dragStartX = e.clientX - state.targetPanX;
+      state.dragStartY = e.clientY - state.targetPanY;
+      canvas.style.cursor = 'grabbing';
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!state.isDragging) return;
+      state.targetPanX = e.clientX - state.dragStartX;
+      state.targetPanY = e.clientY - state.dragStartY;
+      clampPan();
+    });
+
+    window.addEventListener('mouseup', () => {
+      state.isDragging = false;
+      canvas.style.cursor = state.targetZoom > 1.02 ? 'grab' : 'default';
+    });
+
+    // Mobile: Silky-Smooth Pinch-to-Zoom & Single-Finger Drag (No Jitter)
+    function getTouchDistance(t1, t2) {
+      return Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+    }
+
+    function getTouchMidpoint(t1, t2) {
+      return {
+        x: (t1.clientX + t2.clientX) * 0.5,
+        y: (t1.clientY + t2.clientY) * 0.5
+      };
+    }
+
+    canvas.addEventListener('touchstart', (e) => {
+      beatEngine.start();
+      if (e.touches.length === 2) {
+        state.isPinching = true;
+        state.isDragging = false;
+        state.initialPinchDist = getTouchDistance(e.touches[0], e.touches[1]);
+        state.initialPinchZoom = state.targetZoom;
+        const mid = getTouchMidpoint(e.touches[0], e.touches[1]);
+        state.lastPinchMidX = mid.x;
+        state.lastPinchMidY = mid.y;
+      } else if (e.touches.length === 1 && !state.isPinching && state.targetZoom > 1.02) {
+        state.isDragging = true;
+        state.dragStartX = e.touches[0].clientX - state.targetPanX;
+        state.dragStartY = e.touches[0].clientY - state.targetPanY;
+      }
+    }, { passive: true });
+
+    canvas.addEventListener('touchmove', (e) => {
+      if (e.touches.length === 2 && state.isPinching && state.initialPinchDist) {
+        e.preventDefault();
+        const currentDist = getTouchDistance(e.touches[0], e.touches[1]);
+        const mid = getTouchMidpoint(e.touches[0], e.touches[1]);
+
+        // Smooth proportional pinch zoom
+        const scaleRatio = currentDist / state.initialPinchDist;
+        state.targetZoom = Math.max(1, Math.min(2.8, state.initialPinchZoom * scaleRatio));
+
+        // Follow two-finger midpoint smoothly while pinching
+        state.targetPanX += (mid.x - state.lastPinchMidX);
+        state.targetPanY += (mid.y - state.lastPinchMidY);
+        state.lastPinchMidX = mid.x;
+        state.lastPinchMidY = mid.y;
+
+        if (state.targetZoom <= 1.02) {
+          state.targetZoom = 1;
+          state.targetPanX = 0;
+          state.targetPanY = 0;
+        } else {
+          clampPan();
+        }
+        updateZoomUI();
+      } else if (e.touches.length === 1 && state.isDragging && !state.isPinching) {
+        e.preventDefault();
+        state.targetPanX = e.touches[0].clientX - state.dragStartX;
+        state.targetPanY = e.touches[0].clientY - state.dragStartY;
+        clampPan();
+      }
+    }, { passive: false });
+
+    canvas.addEventListener('touchend', (e) => {
+      if (e.touches.length < 2) {
+        state.isPinching = false;
+        state.initialPinchDist = null;
+      }
+      if (e.touches.length === 1 && state.targetZoom > 1.02) {
+        // Re-anchor drag origin smoothly when lifting one finger so pan never jumps
+        state.isDragging = true;
+        state.dragStartX = e.touches[0].clientX - state.targetPanX;
+        state.dragStartY = e.touches[0].clientY - state.targetPanY;
+      } else if (e.touches.length === 0) {
+        state.isDragging = false;
+      }
+    });
+
+    // Double-tap / Double-click quick zoom toggle
+    let lastTapTime = 0;
+    canvas.addEventListener('click', () => {
+      const now = Date.now();
+      if (now - lastTapTime < 280) {
+        if (state.targetZoom > 1.2) {
+          resetCamera();
+        } else {
+          state.targetZoom = 1.9;
+          state.targetPanY = 30;
+          updateZoomUI();
+        }
+      }
+      lastTapTime = now;
+    });
+
+    // Start Animation Loop on Window Load
+    window.onload = function () {
+      requestAnimationFrame(animate);
+    };
+  </script>
+</body>
+</html>
