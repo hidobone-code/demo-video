@@ -181,6 +181,32 @@
       pointer-events: none;
     }
 
+    /* Sleek Zoom Range Slider */
+    input[type="range"].zoom-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      background: rgba(255, 255, 255, 0.55);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
+      height: 3.5px;
+      border-radius: 999px;
+      outline: none;
+    }
+    input[type="range"].zoom-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 2px solid #e11d48;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.28);
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+    input[type="range"].zoom-slider::-webkit-slider-thumb:active {
+      transform: scale(1.2);
+    }
+
     canvas {
       display: block;
       width: 100%;
@@ -342,20 +368,25 @@
       </div>
     </div>
 
-    <!-- ZOOM HINT & RESET PILL (Floats cleanly above bottom controls) -->
-    <div class="absolute bottom-[164px] inset-x-3 z-20 flex items-center justify-between pointer-events-none">
-      <div id="zoomHintBadge" class="glass-dark text-white/90 text-[10px] px-2.5 py-1 rounded-full flex items-center gap-1.5">
-        <svg class="w-3 h-3 text-amber-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+    <!-- SLEEK FLOATING ZOOM SLIDER BAR -->
+    <div class="absolute bottom-[198px] inset-x-8 z-20 flex items-center justify-center pointer-events-none">
+      <div class="pointer-events-auto bg-transparent px-3 py-1 flex items-center gap-2.5 w-full max-w-[235px] drop-shadow-[0_1px_3px_rgba(0,0,0,0.45)]">
+        <!-- Zoom Magnifier Icon -->
+        <svg class="w-3.5 h-3.5 text-white flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m-3-3h6"/>
         </svg>
-        <span>Phóng to & kéo để soi chi tiết</span>
-      </div>
 
-      <button id="resetZoomBtn" type="button"
-        class="hidden pointer-events-auto bg-stone-900/85 text-white text-[11px] font-semibold px-3 py-1 rounded-full shadow-lg border border-white/25 hover:bg-stone-800 active:scale-95 transition cursor-pointer flex items-center gap-1">
-        <span>↺</span>
-        <span id="zoomLevelText">1x</span>
-      </button>
+        <!-- Interactive Range Slider -->
+        <input id="zoomSlider" type="range" min="1" max="2.8" step="0.05" value="1" aria-label="Thanh trượt thu phóng"
+          class="zoom-slider flex-1 cursor-pointer" />
+
+        <!-- Zoom Level & Quick Reset -->
+        <span id="zoomLevelText" class="text-[10px] font-bold text-white w-7 text-right tabular-nums">1.0x</span>
+        <button id="resetZoomBtn" type="button" title="Đặt lại góc nhìn"
+          class="hidden text-[11px] font-bold text-amber-300 hover:text-white pl-0.5 cursor-pointer leading-none">
+          ↺
+        </button>
+      </div>
     </div>
 
     <!-- BOTTOM INTERACTIVE CONTROL DOCK (Thumb-Friendly 2-Row Layout) -->
@@ -420,7 +451,7 @@
           <button type="button" data-scene="cafe"
             class="scene-btn ctrl-btn rounded-2xl border border-stone-200/90 bg-white/90 px-2 py-2 flex items-center justify-center gap-1.5 cursor-pointer">
             <span class="text-sm">🏮</span>
-            <span class="text-[11px] font-bold text-stone-800">Hẻm Phố</span>
+            <span class="text-[11px] font-bold text-stone-800">Dạo Phố</span>
           </button>
 
           <!-- Scene 3: Red Carpet / Luxury Restaurant -->
@@ -505,7 +536,7 @@
       },
       cafe: {
         id: 'cafe',
-        label: 'Hẻm Phố',
+        label: 'Dạo Phố',
         walkStyle: 'alley'
       },
       gala: {
@@ -1330,7 +1361,7 @@
     }
 
     function drawCafeScene(w, h, walkPhase) {
-      // Aesthetic Sunlit Alley / Hẻm Phố Café with Lush Flowers & Greenery
+      // Aesthetic Sunlit Alley / Dạo Phố Café with Lush Flowers & Greenery
       const vpX = w * 0.5;
       const vpY = h * 0.44;
       const scroll = 1 - (walkPhase % 1);
@@ -2476,7 +2507,7 @@
      */
     const resetZoomBtn = document.getElementById('resetZoomBtn');
     const zoomLevelText = document.getElementById('zoomLevelText');
-    const zoomHintBadge = document.getElementById('zoomHintBadge');
+    const zoomSlider = document.getElementById('zoomSlider');
 
     function clampPan() {
       const rect = viewportEl.getBoundingClientRect();
@@ -2487,15 +2518,27 @@
     }
 
     function updateZoomUI() {
+      zoomSlider.value = state.targetZoom.toFixed(2);
+      zoomLevelText.textContent = `${state.targetZoom.toFixed(1)}x`;
       if (state.targetZoom > 1.05) {
         resetZoomBtn.classList.remove('hidden');
-        zoomLevelText.textContent = `1x (${state.targetZoom.toFixed(1)}x)`;
-        zoomHintBadge.classList.add('opacity-0');
       } else {
         resetZoomBtn.classList.add('hidden');
-        zoomHintBadge.classList.remove('opacity-0');
       }
     }
+
+    zoomSlider.addEventListener('input', (e) => {
+      beatEngine.start();
+      state.targetZoom = parseFloat(e.target.value);
+      if (state.targetZoom <= 1.02) {
+        state.targetZoom = 1;
+        state.targetPanX = 0;
+        state.targetPanY = 0;
+      } else {
+        clampPan();
+      }
+      updateZoomUI();
+    });
 
     function resetCamera() {
       state.targetZoom = 1;
