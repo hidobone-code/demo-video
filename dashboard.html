@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Backend Tracking Dashboard — UEL PhD Live Experiment</title>
+<style>
+  :root {
+    --navy: #001E40;
+    --blue: #00477D;
+    --cyan: #38A9D0;
+    --accent: #D95D39;
+    --bg: #F1F5F9;
+    --card: #FFFFFF;
+    --border: #E2E8F0;
+    --text: #0F2537;
+    --muted: #64748B;
+    --green: #16A34A;
+    --amber: #D97706;
+    --red: #DC2626;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; display: flex; flex-direction: column;
+  }
+
+  header {
+    background: var(--navy); color: #fff;
+    padding: 14px 24px;
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
+    box-shadow: 0 4px 16px rgba(0, 30, 64, 0.25);
+  }
+  .h-left { display: flex; align-items: center; gap: 12px; }
+  .h-badge {
+    background: var(--cyan); color: var(--navy);
+    font-size: 11px; font-weight: 900; padding: 4px 10px; border-radius: 6px;
+  }
+  .h-title { font-size: 16.5px; font-weight: 800; letter-spacing: 0.2px; }
+  .h-sub { font-size: 11.5px; color: #94A3B8; margin-top: 2px; }
+
+  .h-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .btn {
+    border: none; border-radius: 10px; padding: 8px 13px;
+    font-size: 12px; font-weight: 700; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px; transition: opacity 0.15s, transform 0.1s;
+  }
+  .btn:hover { opacity: 0.92; }
+  .btn:active { transform: scale(0.97); }
+  .btn-qr { background: #F59E0B; color: #001E40; font-weight: 800; }
+  .btn-sim-valid { background: #16A34A; color: #fff; }
+  .btn-sim-bad { background: #DC2626; color: #fff; }
+  .btn-export { background: var(--cyan); color: var(--navy); }
+  .btn-ghost { background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+
+  .live-indicator {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11.5px; font-weight: 700; color: #86EFAC;
+    background: rgba(22, 163, 74, 0.18); padding: 6px 11px; border-radius: 99px;
+  }
+  .pulse { width: 8px; height: 8px; border-radius: 50%; background: #22C55E; animation: pulse 1.2s infinite; }
+  @keyframes pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.4);opacity:0.4} }
+
+  main {
+    max-width: 1440px; width: 100%; margin: 0 auto;
+    padding: 20px 24px; display: flex; flex-direction: column; gap: 18px; flex: 1;
+  }
+
+  .kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+  @media (max-width: 1000px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+  .kpi-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+    padding: 15px 16px; box-shadow: 0 2px 8px rgba(15, 37, 55, 0.03);
+  }
+  .kpi-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
+  .kpi-val { font-size: 26px; font-weight: 900; color: var(--navy); margin-top: 6px; }
+  .kpi-sub { font-size: 11.5px; color: var(--muted); margin-top: 4px; }
+
+  .workspace {
+    display: grid; grid-template-columns: 1.42fr 1fr 320px; gap: 16px; align-items: start;
+  }
+  @media (max-width: 1150px) { .workspace { grid-template-columns: 1fr; } }
+
+  .panel {
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+    overflow: hidden; box-shadow: 0 4px 14px rgba(15, 37, 55, 0.04);
+  }
+  .panel-head {
+    padding: 13px 16px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    background: #F8FAFC;
+  }
+  .panel-title { font-size: 13.5px; font-weight: 800; color: var(--navy); }
+  .panel-body { padding: 14px 16px; }
+
+  .table-wrap { overflow-x: auto; max-height: 540px; overflow-y: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th {
+    text-align: left; padding: 10px 10px; background: #F1F5F9;
+    color: var(--muted); font-size: 10.5px; text-transform: uppercase; font-weight: 800;
+    position: sticky; top: 0;
+  }
+  td { padding: 10px 10px; border-bottom: 1px solid #F1F5F9; vertical-align: middle; }
+  tbody tr { cursor: pointer; transition: background 0.12s; }
+  tbody tr:hover { background: #F8FAFC; }
+  tbody tr.selected { background: #EFF6FF; }
+
+  .pill {
+    display: inline-block; padding: 3px 8px; border-radius: 99px;
+    font-size: 10.5px; font-weight: 800; white-space: nowrap;
+  }
+  .pill-A { background: #E0F2FE; color: #0369A1; }
+  .pill-B { background: #FFEDD5; color: #C2410C; }
+  .pill-VALID { background: #DCFCE7; color: #15803D; }
+  .pill-FLAGGED { background: #FEF3C7; color: #B45309; }
+  .pill-REJECTED { background: #FEE2E2; color: #B91C1C; }
+
+  .inspector-empty { text-align: center; color: var(--muted); padding: 40px 16px; font-size: 13px; }
+  .rt-row { display: grid; grid-template-columns: 48px 1fr 56px; align-items: center; gap: 8px; margin-bottom: 9px; font-size: 12px; }
+  .rt-bar-bg { height: 14px; background: #F1F5F9; border-radius: 6px; position: relative; overflow: hidden; }
+  .rt-bar-fill { height: 100%; border-radius: 6px; transition: width 0.3s; }
+  .rt-threshold { position: absolute; top: 0; bottom: 0; left: 18.75%; border-left: 2px dashed #DC2626; z-index: 2; }
+
+  .trace-box {
+    background: #F8FAFC; border: 1px solid var(--border); border-radius: 12px;
+    padding: 11px 12px; margin-top: 12px; font-size: 12px; display: flex; flex-direction: column; gap: 6px;
+  }
+  .reason-tag {
+    display: inline-block; background: #FEE2E2; color: #991B1B;
+    font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; margin: 2px 4px 2px 0;
+  }
+
+  /* Accurate 9:16 Heatmap Phone Preview */
+  .heatmap-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .mini-phone {
+    width: 244px; height: 434px; border-radius: 28px;
+    border: 5px solid #1E293B; background: #FDF8F5;
+    position: relative; overflow: hidden;
+    box-shadow: 0 12px 28px rgba(0, 30, 64, 0.16);
+  }
+  canvas#heatmapCanvas { width: 100%; height: 100%; display: block; }
+  .hm-legend { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.45; }
+  .zone-stats {
+    width: 100%; display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px;
+    font-size: 11px; background: #F8FAFC; border: 1px solid var(--border);
+    border-radius: 10px; padding: 8px 10px;
+  }
+  .z-item { display: flex; justify-content: space-between; color: #334155; }
+  .z-item strong { color: var(--navy); }
+  .hm-toggle { display: flex; gap: 6px; background: #F1F5F9; padding: 3px; border-radius: 8px; }
+  .hm-toggle button {
+    border: none; background: transparent; padding: 4px 8px; border-radius: 6px;
+    font-size: 11px; font-weight: 700; color: var(--muted); cursor: pointer;
+  }
+  .hm-toggle button.active { background: #fff; color: var(--navy); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+  /* QR Modal */
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(0, 30, 64, 0.72);
+    backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center; z-index: 999; padding: 20px;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal-card {
+    background: #fff; border-radius: 22px; max-width: 400px; width: 100%;
+    padding: 24px; text-align: center; box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+    display: flex; flex-direction: column; align-items: center; gap: 14px;
+  }
+  .qr-frame { padding: 12px; background: #fff; border: 2px solid #E2E8F0; border-radius: 18px; }
+  .qr-frame img { width: 240px; height: 240px; display: block; }
+  .qr-url-input {
+    width: 100%; padding: 8px 10px; border-radius: 10px; border: 1px solid #CBD5E1;
+    font-size: 11.5px; color: var(--blue); text-align: center; font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="h-left">
+    <span class="h-badge">BACKEND TRACKING</span>
+    <div>
+      <div class="h-title">Hệ thống Giám sát Dữ liệu Thực nghiệm Thời gian thực (Paradata &amp; Quality Audit)</div>
+      <div class="h-sub">Đề tài Tiến sĩ QTKD • UEL – ĐHQG-HCM • Thang đo mẫu: IMM (2 câu) + FLO (3 câu) + Bẫy chú ý (ATT1)</div>
+    </div>
+  </div>
+  <div class="h-actions">
+    <div class="live-indicator"><span class="pulse"></span> <span id="syncModeText">Google Sheets Live</span></div>
+    <button class="btn btn-qr" onclick="openQrModal()">📱 Hiện mã QR</button>
+    <button class="btn btn-sim-valid" onclick="simulateRespondent('valid')">+ Giả lập Hợp lệ</button>
+    <button class="btn btn-sim-bad" onclick="simulateRespondent('cheater')">+ Giả lập Đánh đại</button>
+    <button class="btn btn-export" onclick="exportSmartPLSCSV()">⬇ CSV SmartPLS 4</button>
+    <button class="btn btn-ghost" onclick="fetchFromGoogleSheets(true)">🔄 Làm mới</button>
+  </div>
+</header>
+
+<main>
+  <section class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">Tổng mẫu thu nhận (N)</div>
+      <div class="kpi-val" id="kpiTotal">0</div>
+      <div class="kpi-sub" id="kpiAB">Nhóm A: 0 • Nhóm B: 0</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Mẫu Hợp lệ (Valid)</div>
+      <div class="kpi-val" style="color:var(--green);" id="kpiValid">0</div>
+      <div class="kpi-sub" id="kpiValidPct">0% đạt chuẩn phân tích</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Lọc rác tự động (Rejected)</div>
+      <div class="kpi-val" style="color:var(--red);" id="kpiRejected">0</div>
+      <div class="kpi-sub" id="kpiFlaggedSub">Cần xem xét: 0</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Thời gian đọc TB / câu</div>
+      <div class="kpi-val" id="kpiAvgRT">0.0s</div>
+      <div class="kpi-sub">Ngưỡng Speeder: &lt; 1.5s/câu</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Tỷ lệ bấm "CHỐT ĐƠN"</div>
+      <div class="kpi-val" style="color:var(--accent);" id="kpiCtaRate">0%</div>
+      <div class="kpi-sub" id="kpiAvgClicks">TB tương tác Video: 0</div>
+    </div>
+  </section>
+
+  <section class="workspace">
+    <!-- 1. LIVE LOG TABLE -->
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">📋 Dòng dữ liệu trực tiếp (Chạm 1 dòng để soi chi tiết Paradata)</span>
+        <span style="font-size:11px;color:var(--muted);" id="tableCountText">0 phiên</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Mã phiên</th>
+              <th>Nhóm</th>
+              <th>Video / Click</th>
+              <th>TB/câu</th>
+              <th>Bẫy (ATT)</th>
+              <th>SD</th>
+              <th>Trạng thái</th>
+            </tr>
+          </thead>
+          <tbody id="logTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 2. DEEP-DIVE PARADATA INSPECTOR -->
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">🔍 Soi hành vi &amp; Thời gian đọc từng câu</span>
+        <span style="font-size:11px;font-weight:700;color:var(--blue);" id="inspectorId">—</span>
+      </div>
+      <div class="panel-body" id="inspectorBody">
+        <div class="inspector-empty">
+          Bấm nút <strong>📱 Hiện mã QR</strong> ở góc trên để Hội đồng quét trải nghiệm trên điện thoại — dữ liệu sẽ tự động hiển thị sau ~3 giây.
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. EXACT 9:16 TOUCH HEATMAP -->
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">🔥 Bản đồ nhiệt Video 9:16</span>
+        <div class="hm-toggle">
+          <button id="hmAllBtn" class="active" onclick="setHeatmapMode('all')">Tất cả</button>
+          <button id="hmOneBtn" onclick="setHeatmapMode('one')">1 mẫu</button>
+        </div>
+      </div>
+      <div class="panel-body heatmap-wrap">
+        <div class="mini-phone">
+          <canvas id="heatmapCanvas" width="244" height="434"></canvas>
+        </div>
+        <div class="zone-stats" id="zoneStatsBox">
+          <div class="z-item"><span>👗 Chọn Set đồ:</span><strong id="zOutfit">0</strong></div>
+          <div class="z-item"><span>✨ Đổi Bối cảnh:</span><strong id="zScene">0</strong></div>
+          <div class="z-item"><span>🛒 VPE Chốt đơn:</span><strong id="zCta">0</strong></div>
+          <div class="z-item"><span>🔍 Zoom / Model:</span><strong id="zModel">0</strong></div>
+        </div>
+        <div class="hm-legend" id="hmLegend">
+          Khớp đúng tỷ lệ giao diện 9:16 của Video tương tác.
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- QR MODAL -->
+<div class="modal-backdrop" id="qrModal" onclick="closeQrModal(event)">
+  <div class="modal-card" onclick="event.stopPropagation()">
+    <div style="font-size:11px;font-weight:800;color:#00477D;background:#EFF6FF;padding:4px 12px;border-radius:99px;">
+      TRẢI NGHIỆM TRỰC TIẾP TRÊN ĐIỆN THOẠI
+    </div>
+    <h3 style="font-size:18px;font-weight:800;color:#001E40;">Quét mã QR để làm thử khảo sát</h3>
+    <div class="qr-frame"><img id="qrImg" src="" alt="QR Code Survey"></div>
+    <p style="font-size:12px;color:#64748B;line-height:1.45;">
+      Sau khi Quý Thầy/Cô bấm <strong>Hoàn tất</strong> trên điện thoại, kết quả Paradata &amp; Bản đồ nhiệt sẽ tự động nhảy lên màn hình này.
+    </p>
+    <input type="text" class="qr-url-input" id="qrUrlInput" onchange="updateQrImage()">
+    <button class="btn" style="background:#001E40;color:#fff;width:100%;justify-content:center;padding:11px;" onclick="document.getElementById('qrModal').classList.remove('open')">
+      Đóng &amp; Xem dữ liệu Live
+    </button>
+  </div>
+</div>
+
+<script>
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzdn9ZxwRbmaYOwfNxTxWtZdiNNmeuYHQvtB9FOfEU9xWU7alda7gCTEDvXWjRZoxBw/exec";
+  const DEFAULT_SURVEY_URL = "https://hidobone-code.github.io/demo-video/survey.html";
+  const STORAGE_KEY = "uel_phd_live_experiment_v1";
+  const channel = ("BroadcastChannel" in window) ? new BroadcastChannel("uel_phd_live_channel") : null;
+
+  let remoteRecords = [], localRecords = [], records = [];
+  let selectedId = null, heatmapMode = "all";
+
+  function getDefaultSurveyUrl() {
+    if (window.location.protocol.startsWith("http")) {
+      return window.location.href.replace(/dashboard\.html.*$/i, "survey.html");
+    }
+    return DEFAULT_SURVEY_URL;
+  }
+
+  function openQrModal() {
+    const inp = document.getElementById("qrUrlInput");
+    if (!inp.value) inp.value = getDefaultSurveyUrl();
+    updateQrImage();
+    document.getElementById("qrModal").classList.add("open");
+  }
+
+  function updateQrImage() {
+    const url = document.getElementById("qrUrlInput").value.trim() || DEFAULT_SURVEY_URL;
+    document.getElementById("qrImg").src =
+      "https://api.qrserver.com/v1/create-qr-code/?size=280x280&margin=8&data=" + encodeURIComponent(url);
+  }
+
+  function closeQrModal(e) {
+    if (e.target.id === "qrModal") document.getElementById("qrModal").classList.remove("open");
+  }
+
+  function mergeAndRender() {
+    const map = new Map();
+    remoteRecords.forEach(r => { if (r && r.sessionId) map.set(r.sessionId, r); });
+    localRecords.forEach(r => { if (r && r.sessionId && !map.has(r.sessionId)) map.set(r.sessionId, r); });
+    records = Array.from(map.values());
+    if (records.length > 0 && (!selectedId || !map.has(selectedId))) selectedId = records[0].sessionId;
+    renderAll();
+  }
+
+  function loadLocalRecords() {
+    try { localRecords = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); } catch (e) { localRecords = []; }
+    mergeAndRender();
+  }
+
+  if (channel) {
+    channel.onmessage = (ev) => {
+      if (ev.data && ev.data.type === "NEW_RECORD") {
+        loadLocalRecords();
+        selectedId = ev.data.record.sessionId;
+        renderAll();
+      }
+    };
+  }
+  window.addEventListener("storage", (e) => { if (e.key === STORAGE_KEY) loadLocalRecords(); });
+
+  async function fetchFromGoogleSheets(manual = false) {
+    if (!SCRIPT_URL || !SCRIPT_URL.startsWith("http")) return;
+    const statusEl = document.getElementById("syncModeText");
+    if (manual) statusEl.textContent = "Đang tải...";
+    try {
+      const res = await fetch(SCRIPT_URL + "?t=" + Date.now());
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        const prevCount = remoteRecords.length;
+        remoteRecords = data.slice().reverse();
+        if (remoteRecords.length > prevCount && remoteRecords[0]) selectedId = remoteRecords[0].sessionId;
+        statusEl.textContent = "Google Sheets Live • " + new Date().toLocaleTimeString("vi-VN");
+        mergeAndRender();
+      }
+    } catch (e) {
+      statusEl.textContent = "Live (Offline Fallback)";
+    }
+  }
+
+  function renderAll() {
+    renderKPIs();
+    renderTable();
+    renderInspector();
+    renderHeatmap();
+  }
+
+  function renderKPIs() {
+    const total = records.length;
+    const gA = records.filter(r => r.group === "A").length;
+    const gB = records.filter(r => r.group === "B").length;
+    const valid = records.filter(r => r.qualityStatus === "VALID").length;
+    const rejected = records.filter(r => r.qualityStatus === "REJECTED").length;
+    const flagged = records.filter(r => r.qualityStatus === "FLAGGED").length;
+
+    const avgRt = total ? (records.reduce((s, r) => s + (r.avgRtMs || 0), 0) / total / 1000).toFixed(2) : "0.0";
+    const ctaPct = total ? Math.round((records.filter(r => r.ctaClicked).length / total) * 100) : 0;
+    const avgClicks = total ? (records.reduce((s, r) => s + (r.interactionCount || 0), 0) / total).toFixed(1) : "0";
+
+    document.getElementById("kpiTotal").textContent = total;
+    document.getElementById("kpiAB").textContent = `Nhóm A: ${gA} • Nhóm B: ${gB}`;
+    document.getElementById("kpiValid").textContent = valid;
+    document.getElementById("kpiValidPct").textContent = `${total ? Math.round((valid/total)*100) : 0}% đạt chuẩn phân tích`;
+    document.getElementById("kpiRejected").textContent = rejected;
+    document.getElementById("kpiFlaggedSub").textContent = `Cần xem xét: ${flagged}`;
+    document.getElementById("kpiAvgRT").textContent = avgRt + "s";
+    document.getElementById("kpiCtaRate").textContent = ctaPct + "%";
+    document.getElementById("kpiAvgClicks").textContent = `TB tương tác Video: ${avgClicks}`;
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById("logTableBody");
+    document.getElementById("tableCountText").textContent = `${records.length} phiên`;
+    if (records.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#94A3B8;padding:30px;">Chưa có dữ liệu. Hãy bấm <strong>📱 Hiện mã QR</strong> cho Hội đồng quét hoặc bấm nút Giả lập.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = records.map(r => {
+      const isSel = r.sessionId === selectedId ? "selected" : "";
+      const stLabel = r.qualityStatus === "VALID" ? "Hợp lệ" : (r.qualityStatus === "FLAGGED" ? "Xem xét" : "Loại bỏ");
+      return `
+        <tr class="${isSel}" onclick="selectRecord('${r.sessionId}')">
+          <td>
+            <div style="font-weight:800;color:#001E40;">${r.respondentName}</div>
+            <div style="font-size:10px;color:#64748B;">${r.sessionId} • ${r.timestamp || ""}</div>
+          </td>
+          <td><span class="pill pill-${r.group}">Nhóm ${r.group}</span></td>
+          <td>${((r.videoDurationMs||0)/1000).toFixed(1)}s / <strong>${r.interactionCount||0}</strong> click</td>
+          <td style="font-weight:700;color:${(r.avgRtMs||0)<1600?'#DC2626':'#0F2537'};">${((r.avgRtMs||0)/1000).toFixed(2)}s</td>
+          <td style="font-weight:800;color:${r.attentionPass?'#16A34A':'#DC2626'};">${r.attentionPass ? "Đạt ✓" : "Sai ✕"}</td>
+          <td style="font-weight:700;color:${r.straightLiningSD===0?'#DC2626':'#0F2537'};">${r.straightLiningSD}</td>
+          <td><span class="pill pill-${r.qualityStatus}">${stLabel}</span></td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  function selectRecord(id) {
+    selectedId = id;
+    renderTable();
+    renderInspector();
+    if (heatmapMode === "one") renderHeatmap();
+  }
+
+  function renderInspector() {
+    const body = document.getElementById("inspectorBody");
+    const r = records.find(x => x.sessionId === selectedId);
+    if (!r) {
+      document.getElementById("inspectorId").textContent = "—";
+      body.innerHTML = `<div class="inspector-empty">Chưa chọn phiên dữ liệu nào.</div>`;
+      return;
+    }
+
+    document.getElementById("inspectorId").textContent = `${r.sessionId} • ${r.respondentName}`;
+    const codes = ["IMM1", "IMM2", "FLO1", "ATT1", "FLO2", "FLO3"];
+
+    const barsHtml = codes.map(code => {
+      const it = (r.items && r.items[code]) ? r.items[code] : { value: "-", rtMs: 0, reversals: 0, trace: [] };
+      const sec = (it.rtMs / 1000).toFixed(2);
+      const pct = Math.min(100, Math.round((it.rtMs / 8000) * 100));
+      const isFast = it.rtMs < 1500;
+      const color = isFast ? "#DC2626" : (code === "ATT1" ? "#00477D" : "#38A9D0");
+      const hesText = it.reversals > 0 ? ` • do dự ${it.reversals} lần` : "";
+      return `
+        <div class="rt-row">
+          <strong style="color:${code==='ATT1'?'#DC2626':'#001E40'};">${code}</strong>
+          <div>
+            <div class="rt-bar-bg">
+              <div class="rt-threshold" title="Ngưỡng đánh đại 1.5s"></div>
+              <div class="rt-bar-fill" style="width:${pct}%;background:${color};"></div>
+            </div>
+            <div style="font-size:10px;color:#64748B;margin-top:2px;">
+              Điểm: <strong>${it.value}/7</strong>${hesText} ${it.trace && it.trace.length>1 ? `(kéo: ${it.trace.join("→")})` : ""}
+            </div>
+          </div>
+          <div style="text-align:right;font-weight:800;color:${isFast?'#DC2626':'#0F2537'};">${sec}s</div>
+        </div>
+      `;
+    }).join("");
+
+    const reasonsHtml = (r.reasons && r.reasons.length > 0)
+      ? r.reasons.map(msg => `<span class="reason-tag">⚠ ${msg}</span>`).join("")
+      : `<span style="color:#16A34A;font-weight:700;">✓ Không phát hiện bất thường (Đạt chuẩn đưa vào SmartPLS 4)</span>`;
+
+    const seqText = (r.clickSequence && r.clickSequence.length > 0) ? r.clickSequence.join(" → ") : "Không tương tác (Xem thụ động)";
+
+    body.innerHTML = `
+      <div style="font-size:11px;color:#64748B;margin-bottom:10px;">
+        Biểu đồ <strong>Thời gian đọc &amp; trả lời từng câu</strong> (vạch đỏ đứt = ngưỡng Speeder 1.5s):
+      </div>
+      ${barsHtml}
+      <div class="trace-box">
+        <div><strong>Chuỗi hành vi trên Video:</strong> ${seqText}</div>
+        <div><strong>Bấm "CHỐT ĐƠN":</strong> ${r.ctaClicked ? `Có (tại giây ${(r.timeToFirstCtaMs/1000).toFixed(1)}s)` : "Chưa bấm"}</div>
+        <div><strong>Do dự thanh trượt:</strong> ${r.totalHesitations || 0} lần • <strong>Chuyển tab:</strong> ${r.tabSwitchCount || 0} lần</div>
+        <div><strong>Thiết bị:</strong> ${r.device ? (r.device.ua + " (" + r.device.viewport + ")") : "Mobile"}</div>
+        <div style="margin-top:4px;padding-top:6px;border-top:1px solid #E2E8F0;">${reasonsHtml}</div>
+      </div>
+    `;
+  }
+
+  function setHeatmapMode(mode) {
+    heatmapMode = mode;
+    document.getElementById("hmAllBtn").classList.toggle("active", mode === "all");
+    document.getElementById("hmOneBtn").classList.toggle("active", mode === "one");
+    renderHeatmap();
+  }
+
+  function renderHeatmap() {
+    const c = document.getElementById("heatmapCanvas");
+    const ctx = c.getContext("2d");
+    const w = c.width, h = c.height;
+    ctx.clearRect(0, 0, w, h);
+
+    // 1. Nền mô phỏng đúng bố cục 9:16 của Video tương tác (index.html / survey.html)
+    const bg = ctx.createLinearGradient(0, 0, 0, h);
+    bg.addColorStop(0, "#FFF7ED");
+    bg.addColorStop(0.5, "#FDEEE7");
+    bg.addColorStop(1, "#E6CCB2");
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, w, h);
+
+    // Zone 1: Top VPE Popup & Nút CHỐT ĐƠN NGAY (y: 1.6% - 14.5%)
+    ctx.fillStyle = "rgba(255, 255, 255, 0.88)";
+    ctx.strokeStyle = "#FDA4AF"; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.roundRect(w * 0.03, h * 0.016, w * 0.94, h * 0.125, 10); ctx.fill(); ctx.stroke();
+    // VPE Checkout Button highlight
+    ctx.fillStyle = "rgba(225, 29, 72, 0.18)";
+    ctx.beginPath(); ctx.roundRect(w * 0.64, h * 0.035, w * 0.24, h * 0.088, 6); ctx.fill();
+    ctx.fillStyle = "#BE123C"; ctx.font = "bold 8.5px sans-serif"; ctx.textAlign = "center";
+    ctx.fillText("POPUP VPE (-40%)", w * 0.34, h * 0.085);
+    ctx.fillText("CHỐT ĐƠN", w * 0.76, h * 0.085);
+
+    // Zone 2: Nhân vật 9:16 ở trung tâm (y: 17% - 67%)
+    ctx.strokeStyle = "rgba(148, 163, 184, 0.55)"; ctx.setLineDash([4, 3]); ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.roundRect(w * 0.22, h * 0.17, w * 0.56, h * 0.49, 14); ctx.stroke();
+    ctx.setLineDash([]);
+    // Subtle silhouette icon
+    ctx.fillStyle = "rgba(100, 116, 139, 0.18)";
+    ctx.beginPath(); ctx.arc(w * 0.5, h * 0.28, 14, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(w * 0.42, h * 0.34); ctx.lineTo(w * 0.58, h * 0.34); ctx.lineTo(w * 0.64, h * 0.56); ctx.lineTo(w * 0.36, h * 0.56); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = "#64748B"; ctx.font = "bold 9px sans-serif";
+    ctx.fillText("NHÂN VẬT 9:16 (ZOOM)", w * 0.5, h * 0.62);
+
+    // Zone 3: Thanh trượt Zoom (y: 69% - 74%)
+    ctx.fillStyle = "rgba(15, 23, 42, 0.12)";
+    ctx.beginPath(); ctx.roundRect(w * 0.16, h * 0.692, w * 0.68, h * 0.048, 10); ctx.fill();
+    ctx.fillStyle = "#334155"; ctx.font = "bold 8px sans-serif";
+    ctx.fillText("🔍 Thanh trượt Zoom (1.0x – 2.8x)", w * 0.5, h * 0.722);
+
+    // Zone 4: Bottom Control Dock (y: 75.5% - 98.5%)
+    ctx.fillStyle = "rgba(255, 255, 255, 0.90)";
+    ctx.strokeStyle = "#CBD5E1"; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.roundRect(w * 0.028, h * 0.755, w * 0.944, h * 0.23, 14); ctx.fill(); ctx.stroke();
+
+    // Row 1: 3 Set Đồ (y: 78.5% - 87.5%)
+    const outfits = ["Lụa Kem", "Blazer", "Đầm Đỏ"];
+    outfits.forEach((lbl, i) => {
+      const bx = w * (0.055 + i * 0.305);
+      ctx.fillStyle = "rgba(225, 29, 72, 0.08)";
+      ctx.strokeStyle = "rgba(225, 29, 72, 0.32)"; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.roundRect(bx, h * 0.785, w * 0.28, h * 0.085, 7); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = "#9F1239"; ctx.font = "bold 8px sans-serif";
+      ctx.fillText(lbl, bx + w * 0.14, h * 0.835);
+    });
+
+    // Row 2: 3 Bối Cảnh (y: 89.5% - 97%)
+    const scenes = ["Bãi Biển", "Dạo Phố", "Dạ Tiệc"];
+    scenes.forEach((lbl, i) => {
+      const bx = w * (0.055 + i * 0.305);
+      ctx.fillStyle = "rgba(217, 119, 6, 0.10)";
+      ctx.strokeStyle = "rgba(217, 119, 6, 0.35)"; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.roundRect(bx, h * 0.898, w * 0.28, h * 0.072, 7); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = "#92400E"; ctx.font = "bold 8px sans-serif";
+      ctx.fillText(lbl, bx + w * 0.14, h * 0.94);
+    });
+
+    // 2. Gom tọa độ điểm chạm & thống kê theo vùng
+    let pts = [];
+    const zSum = { outfit: 0, scene: 0, cta: 0, zoom: 0, character: 0 };
+
+    const targetList = (heatmapMode === "one")
+      ? records.filter(x => x.sessionId === selectedId)
+      : records;
+
+    targetList.forEach(r => {
+      if (r.touchPoints && r.touchPoints.length) {
+        r.touchPoints.forEach(p => {
+          pts.push(p);
+          if (p.zone && zSum[p.zone] !== undefined) {
+            zSum[p.zone]++;
+          } else {
+            // Suy luận vùng theo tọa độ y% nếu là mẫu cũ
+            if (p.y <= 15) zSum.cta++;
+            else if (p.y >= 68 && p.y <= 75) zSum.zoom++;
+            else if (p.y > 75 && p.y <= 88) zSum.outfit++;
+            else if (p.y > 88) zSum.scene++;
+            else zSum.character++;
+          }
+        });
+      }
+    });
+
+    // 3. Vẽ nhiệt đa tầng (vàng → cam → đỏ tâm nóng)
+    pts.forEach(p => {
+      const px = (p.x / 100) * w;
+      const py = (p.y / 100) * h;
+      const g = ctx.createRadialGradient(px, py, 1, px, py, 20);
+      g.addColorStop(0, "rgba(220, 38, 38, 0.72)");
+      g.addColorStop(0.42, "rgba(249, 115, 22, 0.42)");
+      g.addColorStop(0.75, "rgba(250, 204, 21, 0.18)");
+      g.addColorStop(1, "rgba(250, 204, 21, 0)");
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(px, py, 20, 0, Math.PI * 2); ctx.fill();
+    });
+
+    // Chấm tâm nhỏ giúp nhìn rõ từng điểm chạm chính xác
+    pts.forEach(p => {
+      ctx.fillStyle = "rgba(185, 28, 28, 0.75)";
+      ctx.beginPath(); ctx.arc((p.x / 100) * w, (p.y / 100) * h, 2.2, 0, Math.PI * 2); ctx.fill();
+    });
+
+    document.getElementById("zOutfit").textContent = zSum.outfit;
+    document.getElementById("zScene").textContent = zSum.scene;
+    document.getElementById("zCta").textContent = zSum.cta;
+    document.getElementById("zModel").textContent = zSum.zoom + zSum.character;
+
+    document.getElementById("hmLegend").innerHTML =
+      `Đang hiển thị <strong>${pts.length} điểm chạm</strong> (${heatmapMode === "all" ? "tổng hợp toàn bộ mẫu" : "riêng mẫu đang chọn"}).`;
+  }
+
+  function simulateRespondent(type) {
+    const id = "GZ-" + Math.floor(1000 + Math.random() * 9000);
+    const isValid = type === "valid";
+    const group = isValid ? (Math.random() < 0.7 ? "A" : "B") : "A";
+    const namesValid = ["Minh Anh (GenZ)", "Hoàng Nam (GenZ)", "Khánh Linh (GenZ)", "Gia Bảo (GenZ)"];
+    const namesBad = ["Mẫu Speeder #1", "Mẫu Đánh Đại #2", "Mẫu Sai Bẫy #3"];
+    const rand = (min, max) => Math.floor(min + Math.random() * (max - min + 1));
+
+    const items = isValid ? {
+      IMM1: { value: rand(5,7), rtMs: rand(2600, 5200), dragCount: rand(2,5), reversals: rand(0,1), trace: [4,6] },
+      IMM2: { value: rand(5,7), rtMs: rand(2400, 4800), dragCount: rand(2,4), reversals: 0, trace: [4,5,6] },
+      FLO1: { value: rand(4,7), rtMs: rand(3100, 6200), dragCount: rand(3,6), reversals: rand(1,2), trace: [4,6,5] },
+      ATT1: { value: 2,         rtMs: rand(2800, 4900), dragCount: 2,         reversals: 0, trace: [4,2] },
+      FLO2: { value: rand(5,7), rtMs: rand(2500, 5100), dragCount: rand(2,5), reversals: rand(0,1), trace: [4,7,6] },
+      FLO3: { value: rand(5,7), rtMs: rand(2300, 4600), dragCount: rand(2,4), reversals: 0, trace: [4,6] }
+    } : {
+      IMM1: { value: 7, rtMs: rand(550, 950), dragCount: 1, reversals: 0, trace: [4,7] },
+      IMM2: { value: 7, rtMs: rand(480, 880), dragCount: 1, reversals: 0, trace: [4,7] },
+      FLO1: { value: 7, rtMs: rand(520, 900), dragCount: 1, reversals: 0, trace: [4,7] },
+      ATT1: { value: 7, rtMs: rand(450, 820), dragCount: 1, reversals: 0, trace: [4,7] },
+      FLO2: { value: 7, rtMs: rand(500, 920), dragCount: 1, reversals: 0, trace: [4,7] },
+      FLO3: { value: 7, rtMs: rand(490, 890), dragCount: 1, reversals: 0, trace: [4,7] }
+    };
+
+    // Tọa độ khớp 100% với bố cục mới của Video tương tác
+    const touchPoints = group === "A" ? [
+      { x: rand(12, 26), y: rand(80, 85), zone: "outfit" },
+      { x: rand(44, 56), y: rand(80, 85), zone: "outfit" },
+      { x: rand(73, 86), y: rand(80, 85), zone: "outfit" },
+      { x: rand(44, 56), y: rand(91, 95), zone: "scene" },
+      { x: rand(73, 86), y: rand(91, 95), zone: "scene" },
+      { x: rand(70, 82), y: rand(6, 10),  zone: "cta" },
+      { x: rand(42, 58), y: rand(42, 52), zone: "character" }
+    ] : [{ x: rand(44, 56), y: rand(44, 54), zone: "character" }];
+
+    const rts = Object.values(items).map(x => x.rtMs);
+    const avgRtMs = Math.round(rts.reduce((a, b) => a + b, 0) / rts.length);
+
+    const rec = {
+      sessionId: id,
+      respondentName: isValid ? namesValid[rand(0, namesValid.length - 1)] : namesBad[rand(0, namesBad.length - 1)],
+      timestamp: new Date().toLocaleTimeString("vi-VN"),
+      group: group,
+      videoDurationMs: isValid ? rand(12000, 21000) : rand(2500, 4200),
+      interactionCount: group === "A" ? (isValid ? rand(4, 6) : 1) : 0,
+      clickSequence: group === "A" ? (isValid ? ["Đồ: Đầm Lụa Kem", "Cảnh: Dạo Phố", "Đồ: Đầm Đỏ Tiệc", "Cảnh: Dạ Tiệc", "+Chốt đơn (Đầm Đỏ Tiệc)"] : ["Đồ: Đầm Lụa Kem"]) : [],
+      touchPoints: touchPoints,
+      ctaClicked: isValid && group === "A",
+      timeToFirstCtaMs: (isValid && group === "A") ? rand(6200, 11500) : null,
+      tabSwitchCount: isValid ? 0 : rand(1, 2),
+      items: items,
+      avgRtMs: avgRtMs,
+      totalSessionMs: isValid ? rand(34000, 52000) : rand(6500, 9500),
+      straightLiningSD: isValid ? (Math.round((0.55 + Math.random() * 0.55) * 100) / 100) : 0,
+      totalHesitations: isValid ? rand(1, 3) : 0,
+      attentionPass: isValid,
+      qualityStatus: isValid ? "VALID" : "REJECTED",
+      reasons: isValid ? [] : ["Sai bẫy chú ý (ATT1 ≠ 2)", "Đánh 1 đường thẳng (SD = 0)", "Trả lời quá nhanh (6 câu < 1.5s)"],
+      device: { ua: Math.random() < 0.6 ? "iOS" : "Android", viewport: "390x844" }
+    };
+
+    localRecords.unshift(rec);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(localRecords));
+    selectedId = rec.sessionId;
+    mergeAndRender();
+  }
+
+  function exportSmartPLSCSV() {
+    if (records.length === 0) { alert("Chưa có dữ liệu để xuất!"); return; }
+    const header = [
+      "SessionID", "Respondent", "Group", "IMM1", "IMM2", "FLO1", "FLO2", "FLO3", "ATT1",
+      "VideoWatch_s", "Interactions", "CTA_Click", "AvgRT_s", "Hesitations", "SD", "QualityStatus"
+    ];
+    const rows = records.map(r => [
+      r.sessionId,
+      `"${r.respondentName}"`,
+      r.group,
+      r.items.IMM1?.value ?? "",
+      r.items.IMM2?.value ?? "",
+      r.items.FLO1?.value ?? "",
+      r.items.FLO2?.value ?? "",
+      r.items.FLO3?.value ?? "",
+      r.items.ATT1?.value ?? "",
+      ((r.videoDurationMs || 0) / 1000).toFixed(1),
+      r.interactionCount || 0,
+      r.ctaClicked ? 1 : 0,
+      ((r.avgRtMs || 0) / 1000).toFixed(2),
+      r.totalHesitations || 0,
+      r.straightLiningSD ?? "",
+      r.qualityStatus
+    ].join(","));
+
+    const csv = "\uFEFF" + [header.join(","), ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "SmartPLS4_LiveExperiment_Data.csv";
+    a.click();
+  }
+
+  loadLocalRecords();
+  fetchFromGoogleSheets();
+  setInterval(() => fetchFromGoogleSheets(false), 3000);
+</script>
+</body>
+</html>

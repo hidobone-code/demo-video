@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Khảo sát Thực nghiệm Video Tương tác — UEL PhD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #001E40;
+    --blue: #00477D;
+    --cyan: #38A9D0;
+    --accent: #E11D48;
+    --accent-warm: #D95D39;
+    --card: #FFFFFF;
+    --text: #0F2537;
+    --muted: #64748B;
+    --green: #16A34A;
+    --red: #DC2626;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
+  html, body {
+    width: 100%; height: 100%;
+    background: radial-gradient(circle at 50% 25%, #162638 0%, #090F18 100%);
+    font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+    color: var(--text);
+  }
+
+  /* 9:16 Vertical Mobile Shell */
+  .phone-shell {
+    position: relative;
+    width: 100vw; height: 100dvh;
+    max-width: 430px; max-height: 860px;
+    background: #F8FAFC;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 28px 80px rgba(0,0,0,0.7);
+  }
+  @media (min-width: 480px) {
+    .phone-shell {
+      height: 94vh;
+      aspect-ratio: 9 / 16;
+      border-radius: 36px;
+      border: 7px solid #1E293B;
+    }
+  }
+
+  /* Top Header (Outside tracked video area) */
+  .top-bar {
+    background: var(--navy);
+    color: #fff;
+    padding: 10px 14px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0; z-index: 40; gap: 8px;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 11.5px; font-weight: 800; letter-spacing: 0.3px;
+  }
+  .brand-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--cyan);
+    box-shadow: 0 0 8px var(--cyan);
+  }
+  .group-pill {
+    font-size: 10px; font-weight: 700;
+    padding: 4px 9px; border-radius: 99px;
+    background: rgba(56, 169, 208, 0.22);
+    border: 1px solid rgba(56, 169, 208, 0.5);
+    color: #E0F2FE; cursor: pointer;
+  }
+  .next-survey-pill {
+    display: none;
+    background: linear-gradient(135deg, #E11D48, #F59E0B);
+    color: #fff; border: none; border-radius: 99px;
+    padding: 5px 11px; font-size: 11px; font-weight: 800;
+    cursor: pointer; box-shadow: 0 3px 10px rgba(225, 29, 72, 0.45);
+    animation: gentlePulse 2s infinite;
+  }
+  @keyframes gentlePulse {
+    0%,100% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+  }
+
+  .progress-wrap { height: 4px; background: #E2E8F0; width: 100%; flex-shrink: 0; }
+  .progress-fill { height: 100%; width: 10%; background: linear-gradient(90deg, var(--blue), var(--accent)); transition: width 0.3s ease; }
+
+  .screen { flex: 1; display: none; flex-direction: column; overflow-y: auto; position: relative; }
+  .screen.active { display: flex; }
+
+  /* SCREEN 0: WELCOME */
+  .welcome-body {
+    padding: 20px 18px; display: flex; flex-direction: column; justify-content: space-between;
+    height: 100%; gap: 13px;
+  }
+  .badge-uel {
+    display: inline-block; background: #EFF6FF; color: var(--blue); border: 1px solid #BFDBFE;
+    font-size: 10px; font-weight: 800; padding: 5px 10px; border-radius: 99px; margin-bottom: 8px;
+  }
+  .welcome-title { font-size: 19.5px; font-weight: 800; color: var(--navy); line-height: 1.3; margin-bottom: 6px; }
+  .welcome-desc { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+  .info-box {
+    background: #fff; border: 1px solid #E2E8F0; border-radius: 16px;
+    padding: 12px 13px; display: flex; flex-direction: column; gap: 9px;
+    box-shadow: 0 4px 12px rgba(15, 37, 55, 0.04);
+  }
+  .info-row { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--text); line-height: 1.4; }
+  .info-icon {
+    width: 28px; height: 28px; border-radius: 8px; background: #F1F5F9;
+    display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;
+  }
+  .input-group { display: flex; flex-direction: column; gap: 5px; }
+  .input-group label { font-size: 11.5px; font-weight: 700; color: var(--navy); }
+  .input-group input {
+    width: 100%; padding: 11px 13px; border-radius: 12px;
+    border: 1.5px solid #CBD5E1; font-size: 13.5px; outline: none; user-select: text;
+  }
+  .input-group input:focus { border-color: var(--blue); }
+
+  .btn-primary {
+    width: 100%; padding: 13.5px; border: none; border-radius: 14px;
+    background: var(--accent-warm); color: #fff;
+    font-size: 14px; font-weight: 800; cursor: pointer;
+    box-shadow: 0 8px 20px rgba(217, 93, 57, 0.35);
+    transition: transform 0.12s;
+  }
+  .btn-primary:active { transform: scale(0.98); }
+
+  /* SCREEN 1: REAL INTERACTIVE VIDEO STAGE (TRACKED 9:16) */
+  #screenVideo { overflow: hidden; }
+  .video-stage {
+    position: relative; width: 100%; height: 100%;
+    overflow: hidden; background: #fdf8f5; touch-action: none;
+  }
+  #stageCanvas { display: block; width: 100%; height: 100%; }
+
+  .glass-panel {
+    background: rgba(255, 252, 250, 0.86);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+  }
+  .glass-dark {
+    background: rgba(34, 24, 28, 0.56);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.24);
+  }
+
+  /* Top Status Bar inside Video (y: 1.5% - 7%) */
+  .vid-top-bar {
+    position: absolute; top: 1.6%; left: 3%; right: 3%; z-index: 20;
+    display: flex; align-items: center; justify-content: space-between;
+    transition: opacity 0.25s;
+  }
+  .vid-pill {
+    color: #fff; padding: 5px 10px; border-radius: 99px;
+    font-size: 10.5px; font-weight: 600; display: flex; align-items: center; gap: 6px;
+  }
+  .vid-audio-btn {
+    color: #fff; padding: 5px 10px; border-radius: 99px;
+    font-size: 10.5px; font-weight: 700; display: flex; align-items: center; gap: 5px;
+    cursor: pointer; border: 1px solid rgba(255,255,255,0.25);
+  }
+
+  /* Top VPE Popup (y: 1.5% - 14.5%) */
+  .vpe-popup {
+    position: absolute; top: 1.6%; left: 3%; right: 3%; z-index: 30;
+    border-radius: 16px; padding: 9px 10px;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.16);
+    transform: translateY(-135%); opacity: 0; pointer-events: none;
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s;
+  }
+  .vpe-popup.is-visible { transform: translateY(0); opacity: 1; pointer-events: auto; }
+  .vpe-row { display: flex; align-items: center; gap: 8px; }
+  .vpe-thumb {
+    width: 40px; height: 40px; border-radius: 11px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #fffbeb, #ffe4e6); border: 1px solid #fff;
+  }
+  .vpe-info { flex: 1; min-width: 0; }
+  .vpe-badge {
+    display: inline-block; background: #E11D48; color: #fff;
+    font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 5px;
+  }
+  .vpe-title { font-size: 12px; font-weight: 800; color: #1C1917; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+  .vpe-prices { display: flex; align-items: baseline; gap: 6px; }
+  .vpe-sale { font-size: 13.5px; font-weight: 800; color: #E11D48; }
+  .vpe-orig { font-size: 10px; color: #A8A29E; text-decoration: line-through; }
+  .vpe-cta {
+    background: linear-gradient(90deg, #E11D48, #DB2777, #F59E0B);
+    color: #fff; border: none; border-radius: 11px;
+    padding: 8px 10px; font-size: 10px; font-weight: 800; line-height: 1.2;
+    cursor: pointer; flex-shrink: 0; box-shadow: 0 4px 12px rgba(225, 29, 72, 0.35);
+  }
+  .vpe-close {
+    width: 24px; height: 24px; border-radius: 50%; border: none;
+    background: rgba(231, 229, 228, 0.85); color: #57534E;
+    font-size: 14px; font-weight: 800; cursor: pointer; flex-shrink: 0;
+  }
+
+  /* Order Toast */
+  .order-toast {
+    position: absolute; top: 15.5%; left: 4%; right: 4%; z-index: 35;
+    background: rgba(6, 78, 59, 0.92); color: #fff; border-radius: 14px;
+    padding: 9px 12px; font-size: 11px; display: flex; align-items: center; gap: 8px;
+    border: 1px solid rgba(52, 211, 153, 0.45);
+    transform: translateY(-14px); opacity: 0; pointer-events: none; transition: all 0.3s;
+  }
+  .order-toast.is-visible { transform: translateY(0); opacity: 1; }
+
+  /* Floating Zoom Bar (y: 69% - 74%) */
+  .zoom-dock {
+    position: absolute; bottom: 25.8%; left: 16%; right: 16%; z-index: 20;
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(15, 23, 42, 0.36); backdrop-filter: blur(6px);
+    padding: 5px 10px; border-radius: 99px;
+  }
+  input[type="range"].zoom-slider {
+    -webkit-appearance: none; flex: 1; height: 3.5px; border-radius: 99px;
+    background: rgba(255,255,255,0.65); outline: none;
+  }
+  input[type="range"].zoom-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 15px; height: 15px; border-radius: 50%;
+    background: #fff; border: 2px solid #E11D48; cursor: pointer;
+  }
+  .zoom-val { font-size: 10px; font-weight: 800; color: #fff; min-width: 28px; text-align: right; }
+
+  /* Bottom Interactive Control Dock (y: 75.5% - 98.5%) */
+  .control-dock {
+    position: absolute; bottom: 1.5%; left: 2.8%; right: 2.8%; z-index: 20;
+    border-radius: 22px; padding: 8px 9px;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.14);
+    display: flex; flex-direction: column; gap: 7px;
+  }
+  .dock-head {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 3px; font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px;
+  }
+  .dock-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .ctrl-btn {
+    border: 1.5px solid rgba(231, 229, 228, 0.95);
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 13px; padding: 6px 4px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer; transition: transform 0.14s, border-color 0.2s, background 0.2s;
+  }
+  .ctrl-btn:active { transform: scale(0.94); }
+  .ctrl-btn.active-outfit { background: #FFF1F2; border-color: #E11D48; }
+  .ctrl-btn.active-scene { background: #FFFBEB; border-color: #D97706; }
+  .ctrl-swatch { width: 16px; height: 16px; border-radius: 50%; margin-bottom: 3px; border: 1px solid rgba(0,0,0,0.12); }
+  .ctrl-label { font-size: 10.5px; font-weight: 800; color: #1C1917; line-height: 1.15; }
+  .ctrl-price { font-size: 9px; font-weight: 700; color: #E11D48; margin-top: 1px; }
+  .scene-row-btn { flex-direction: row; gap: 4px; padding: 7px 4px; }
+
+  .linear-bar {
+    position: absolute; bottom: 2.5%; left: 4%; right: 4%; z-index: 20;
+    background: rgba(0, 30, 64, 0.88); color: #E2E8F0;
+    border-radius: 16px; padding: 11px 14px; font-size: 11.5px; text-align: center;
+    backdrop-filter: blur(8px); line-height: 1.45;
+  }
+
+  /* Touch Ripple Visual Feedback */
+  .touch-ripple {
+    position: absolute; width: 24px; height: 24px; border-radius: 50%;
+    background: rgba(225, 29, 72, 0.42); border: 2px solid #E11D48;
+    transform: translate(-50%, -50%) scale(0.4);
+    pointer-events: none; z-index: 60;
+    animation: rippleOut 0.5s ease-out forwards;
+  }
+  @keyframes rippleOut { to { transform: translate(-50%, -50%) scale(2.1); opacity: 0; } }
+
+  /* SCREEN 2: GAMIFIED SLIDER SURVEY */
+  .survey-body {
+    padding: 18px 18px; display: flex; flex-direction: column; justify-content: space-between;
+    height: 100%; gap: 14px;
+  }
+  .q-meta { display: flex; justify-content: space-between; align-items: center; }
+  .q-code {
+    background: #EFF6FF; color: var(--blue); border: 1px solid #BFDBFE;
+    font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 99px;
+  }
+  .q-code.trap { background: #FEF2F2; color: var(--red); border-color: #FECACA; }
+  .q-step { font-size: 12px; font-weight: 700; color: var(--muted); }
+  .q-card {
+    background: #fff; border: 1px solid #E2E8F0; border-radius: 22px;
+    padding: 20px 18px; box-shadow: 0 10px 28px rgba(15, 37, 55, 0.06);
+    display: flex; flex-direction: column; gap: 20px;
+  }
+  .q-construct { font-size: 10.5px; font-weight: 800; color: var(--cyan); text-transform: uppercase; letter-spacing: 0.6px; }
+  .q-text { font-size: 15.5px; font-weight: 800; color: var(--navy); line-height: 1.45; min-height: 66px; }
+  .slider-readout { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .slider-num {
+    width: 52px; height: 52px; border-radius: 16px;
+    background: var(--navy); color: #fff; font-size: 24px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center; transition: background 0.2s;
+  }
+  .slider-label { font-size: 12px; font-weight: 700; color: var(--accent-warm); margin-top: 2px; }
+  input[type="range"].likert-slider {
+    -webkit-appearance: none; width: 100%; height: 10px; border-radius: 99px; background: #E2E8F0; outline: none;
+  }
+  input[type="range"].likert-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 30px; height: 30px; border-radius: 50%;
+    background: var(--accent-warm); border: 4px solid #fff;
+    box-shadow: 0 4px 12px rgba(217, 93, 57, 0.5); cursor: pointer;
+  }
+  .slider-ticks { display: flex; justify-content: space-between; font-size: 10.5px; font-weight: 700; color: var(--muted); padding: 0 4px; }
+  .slider-anchors { display: flex; justify-content: space-between; font-size: 10px; color: #94A3B8; margin-top: -12px; }
+  .paradata-hint { font-size: 10.5px; color: var(--muted); text-align: center; background: #F1F5F9; padding: 7px 10px; border-radius: 10px; }
+
+  /* SCREEN 3: DONE */
+  .done-body {
+    padding: 24px 20px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center; height: 100%; gap: 13px;
+  }
+  .done-icon {
+    width: 62px; height: 62px; border-radius: 50%; background: #DCFCE7; color: var(--green);
+    display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 900;
+  }
+  .summary-card {
+    width: 100%; background: #fff; border: 1px solid #E2E8F0; border-radius: 16px;
+    padding: 14px; text-align: left; font-size: 12px; display: flex; flex-direction: column; gap: 6px;
+  }
+  .sum-row { display: flex; justify-content: space-between; }
+  .sum-val { font-weight: 800; color: var(--navy); }
+  .status-badge { display: inline-block; padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 800; }
+  .status-VALID { background: #DCFCE7; color: #15803D; }
+  .status-FLAGGED { background: #FEF3C7; color: #B45309; }
+  .status-REJECTED { background: #FEE2E2; color: #B91C1C; }
+  .sync-pill { font-size: 11px; font-weight: 700; color: #0369A1; background: #E0F2FE; padding: 5px 12px; border-radius: 99px; }
+  .btn-secondary {
+    width: 100%; padding: 12px; border: 1.5px solid #CBD5E1; border-radius: 12px;
+    background: #fff; color: var(--navy); font-size: 13px; font-weight: 700; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<audio id="bgMusic" src="./music.mp3" loop preload="auto"></audio>
+
+<div class="phone-shell" id="phoneShell">
+  <div class="top-bar">
+    <div class="brand">
+      <span class="brand-dot"></span>
+      <span id="topBrandText">UEL • LIVE EXPERIMENT</span>
+    </div>
+    <button class="group-pill" id="groupBadge" onclick="cycleGroupForDemo()" title="Chạm đổi nhóm A/B khi demo">
+      Nhóm A • Tương tác
+    </button>
+    <button class="next-survey-pill" id="toSurveyTopBtn" onclick="startSurvey()">
+      Khảo sát (6 câu) →
+    </button>
+  </div>
+  <div class="progress-wrap"><div class="progress-fill" id="progressFill"></div></div>
+
+  <!-- SCREEN 0: WELCOME -->
+  <section class="screen active" id="screenWelcome">
+    <div class="welcome-body">
+      <div>
+        <span class="badge-uel">THỰC NGHIỆM HÀNH VI &amp; THU THẬP DỮ LIỆU THỜI GIAN THỰC</span>
+        <h1 class="welcome-title">Trải nghiệm Video &amp; Đánh giá Tức thời</h1>
+        <p class="welcome-desc">
+          Hệ thống tự động phân luồng ngẫu nhiên A/B, ghi nhận chính xác tọa độ điểm chạm (Heatmap), chuỗi hành vi và thời gian đọc từng câu hỏi.
+        </p>
+      </div>
+
+      <div class="info-box">
+        <div class="info-row">
+          <div class="info-icon">🎬</div>
+          <div><strong>Bước 1:</strong> Xem &amp; tương tác trực tiếp với Video 9:16 (chọn Set đồ, Bối cảnh, Zoom, Chốt đơn).</div>
+        </div>
+        <div class="info-row">
+          <div class="info-icon">🎚️</div>
+          <div><strong>Bước 2:</strong> Bấm <strong>Khảo sát (6 câu) →</strong> ở góc trên để đánh giá thang đo <strong>IMM + FLO + Bẫy chú ý</strong>.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-icon">📡</div>
+          <div><strong>Bước 3:</strong> Toàn bộ Paradata &amp; Heatmap bắn trực tiếp lên Backend máy chiếu.</div>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="respondentName">Tên / Mã người tham gia (tùy chọn để hiện trên Dashboard)</label>
+        <input type="text" id="respondentName" placeholder="VD: Thầy A, Cô B, hoặc để trống..." maxlength="24">
+      </div>
+
+      <button class="btn-primary" onclick="startVideoStage()">Bắt đầu trải nghiệm Video →</button>
+    </div>
+  </section>
+
+  <!-- SCREEN 1: REAL INTERACTIVE VIDEO STAGE (9:16) -->
+  <section class="screen" id="screenVideo">
+    <div class="video-stage" id="videoStageArea">
+      <canvas id="stageCanvas"></canvas>
+
+      <!-- Top Status Pill & Audio -->
+      <div class="vid-top-bar" id="topStatusBar">
+        <div class="glass-dark vid-pill">
+          <span style="width:7px;height:7px;border-radius:50%;background:#34D399;"></span>
+          <span id="currentContextLabel">Ở nhà • Đồ ngủ pastel</span>
+        </div>
+        <button class="glass-dark vid-audio-btn" id="audioToggleBtn" type="button">
+          <span id="audioBtnText">🔊 Nhạc</span>
+          <span id="watchTimer" style="opacity:0.85;font-variant-numeric:tabular-nums;">0.0s</span>
+        </button>
+      </div>
+
+      <!-- Top VPE Popup (y: ~2% - 14%) -->
+      <div class="vpe-popup glass-panel" id="vpePopup">
+        <div class="vpe-row">
+          <div class="vpe-thumb" id="vpeThumb">👗</div>
+          <div class="vpe-info">
+            <span class="vpe-badge" id="vpeDiscountBadge">-40% FLASH SALE</span>
+            <div class="vpe-title" id="vpeTitle">Set 1: Đầm Lụa Kem</div>
+            <div class="vpe-prices">
+              <span class="vpe-sale" id="vpeSalePrice">749.000đ</span>
+              <span class="vpe-orig" id="vpeOrigPrice">1.250.000đ</span>
+            </div>
+          </div>
+          <button class="vpe-cta" id="checkoutBtn" type="button">CHỐT ĐƠN<br>NGAY</button>
+          <button class="vpe-close" id="closeVpeBtn" type="button">×</button>
+        </div>
+      </div>
+
+      <!-- Order Toast -->
+      <div class="order-toast" id="orderToast">
+        <span style="font-size:16px;">🎉</span>
+        <div>
+          <div style="font-weight:800;color:#6EE7B7;">Đã thêm vào đơn hàng!</div>
+          <div id="orderToastDetail">Giữ ưu đãi thành công</div>
+        </div>
+      </div>
+
+      <!-- Floating Zoom Slider (y: ~69% - 74%) -->
+      <div class="zoom-dock" id="zoomDock">
+        <span style="font-size:11px;color:#fff;">🔍</span>
+        <input id="zoomSlider" type="range" min="1" max="2.8" step="0.05" value="1" class="zoom-slider">
+        <span id="zoomLevelText" class="zoom-val">1.0x</span>
+      </div>
+
+      <!-- Group A: Real 2-Row Bottom Dock (y: ~75.5% - 98.5%) -->
+      <div class="control-dock glass-panel" id="interactiveDock">
+        <div>
+          <div class="dock-head" style="color:#BE123C;margin-bottom:4px;">
+            <span>👗 Chọn Set Đồ (Xem giá)</span>
+            <span id="resetPajamaBtn" style="color:#64748B;text-decoration:underline;cursor:pointer;text-transform:none;font-weight:600;">Đồ ngủ</span>
+          </div>
+          <div class="dock-grid">
+            <button type="button" class="ctrl-btn outfit-btn" data-outfit="cream">
+              <span class="ctrl-swatch" style="background:linear-gradient(135deg,#FDE68A,#FFFBEB);"></span>
+              <span class="ctrl-label">Đầm Lụa Kem</span>
+              <span class="ctrl-price">749K</span>
+            </button>
+            <button type="button" class="ctrl-btn outfit-btn" data-outfit="tweed">
+              <span class="ctrl-swatch" style="background:linear-gradient(135deg,#F9A8D4,#E0F2FE);"></span>
+              <span class="ctrl-label">Blazer &amp; Váy</span>
+              <span class="ctrl-price">689K</span>
+            </button>
+            <button type="button" class="ctrl-btn outfit-btn" data-outfit="red">
+              <span class="ctrl-swatch" style="background:linear-gradient(135deg,#9F1239,#FB7185);"></span>
+              <span class="ctrl-label">Đầm Đỏ Tiệc</span>
+              <span class="ctrl-price">890K</span>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <div class="dock-head" style="color:#B45309;margin-bottom:4px;">
+            <span>✨ Đổi Bối Cảnh &amp; Phong Cách</span>
+            <span style="color:#94A3B8;font-weight:600;text-transform:none;">110 BPM</span>
+          </div>
+          <div class="dock-grid">
+            <button type="button" class="ctrl-btn scene-btn scene-row-btn" data-scene="beach">
+              <span>🏖️</span><span class="ctrl-label">Bãi Biển</span>
+            </button>
+            <button type="button" class="ctrl-btn scene-btn scene-row-btn" data-scene="cafe">
+              <span>🏮</span><span class="ctrl-label">Dạo Phố</span>
+            </button>
+            <button type="button" class="ctrl-btn scene-btn scene-row-btn" data-scene="gala">
+              <span>🥂</span><span class="ctrl-label">Dạ Tiệc</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Group B: Linear Mode Notice -->
+      <div class="linear-bar" id="linearBar" style="display:none;">
+        📺 <strong>Nhóm B • Video Tuyến tính:</strong> Trang phục &amp; bối cảnh tự động trình chiếu tuần tự (không có nút tương tác). Bấm <strong>Khảo sát (6 câu) →</strong> ở góc trên khi xem xong.
+      </div>
+    </div>
+  </section>
+
+  <!-- SCREEN 2: GAMIFIED SLIDER SURVEY -->
+  <section class="screen" id="screenSurvey">
+    <div class="survey-body">
+      <div class="q-meta">
+        <span class="q-code" id="qCodeBadge">IMM1</span>
+        <span class="q-step" id="qStepLabel">Câu 1 / 6</span>
+      </div>
+
+      <div class="q-card">
+        <div>
+          <div class="q-construct" id="qConstruct">SỰ ĐẮM CHÌM (IMMERSION)</div>
+          <div class="q-text" id="qText">...</div>
+        </div>
+
+        <div class="slider-readout">
+          <div class="slider-num" id="sliderNum">4</div>
+          <div class="slider-label" id="sliderLabel">Chạm hoặc kéo thanh trượt (1 – 7)</div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <input type="range" min="1" max="7" step="1" value="4" class="likert-slider" id="likertSlider">
+          <div class="slider-ticks">
+            <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span>
+          </div>
+          <div class="slider-anchors">
+            <span>Hoàn toàn không đồng ý</span>
+            <span>Hoàn toàn đồng ý</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="paradata-hint">
+        ⏱ Hệ thống đang ghi nhận thời gian đọc &amp; độ do dự thanh trượt...
+      </div>
+
+      <button class="btn-primary" id="nextQBtn" onclick="nextQuestion()">Câu tiếp theo →</button>
+    </div>
+  </section>
+
+  <!-- SCREEN 3: DONE -->
+  <section class="screen" id="screenDone">
+    <div class="done-body">
+      <div class="done-icon">✓</div>
+      <h2 style="font-size:19.5px;font-weight:800;color:#001E40;">Đã ghi nhận dữ liệu!</h2>
+      <div class="sync-pill" id="syncStatusPill">📡 Đang đồng bộ lên Google Sheets Live...</div>
+      <div class="summary-card" id="summaryCard"></div>
+      <button class="btn-primary" onclick="location.reload()">Thực hiện lượt thử nghiệm mới</button>
+      <button class="btn-secondary" onclick="window.open('dashboard.html', '_blank')">Mở trang Backend Tracking ↗</button>
+    </div>
+  </section>
+</div>
+
+<script>
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzdn9ZxwRbmaYOwfNxTxWtZdiNNmeuYHQvtB9FOfEU9xWU7alda7gCTEDvXWjRZoxBw/exec";
+  const STORAGE_KEY = "uel_phd_live_experiment_v1";
+  const channel = ("BroadcastChannel" in window) ? new BroadcastChannel("uel_phd_live_channel") : null;
+
+  // ==================== 1. OUTFIT & SCENE CONFIG ====================
+  const OUTFIT_DATA = {
+    pajama: { id: 'pajama', shortName: 'Đồ ngủ pastel', title: 'Set Đồ Ngủ Pastel', salePrice: '320.000đ', origPrice: '490.000đ', discount: '-35%', accent: '#7dd3fc', emoji: '🧸' },
+    cream:  { id: 'cream',  shortName: 'Đầm Lụa Kem',   title: 'Set 1: Đầm Lụa Kem', salePrice: '749.000đ', origPrice: '1.250.000đ', discount: '-40% FLASH SALE', accent: '#f59e0b', emoji: '👗' },
+    tweed:  { id: 'tweed',  shortName: 'Blazer & Váy',  title: 'Set 2: Blazer & Váy', salePrice: '689.000đ', origPrice: '1.150.000đ', discount: '-40% FLASH SALE', accent: '#ec4899', emoji: '🧥' },
+    red:    { id: 'red',    shortName: 'Đầm Đỏ Tiệc',   title: 'Set 3: Đầm Đỏ Tiệc', salePrice: '890.000đ', origPrice: '1.490.000đ', discount: '-40% FLASH SALE', accent: '#e11d48', emoji: '💃' }
+  };
+  const SCENE_DATA = {
+    bedroom: { id: 'bedroom', label: 'Ở nhà' },
+    beach:   { id: 'beach',   label: 'Bãi Biển' },
+    cafe:    { id: 'cafe',    label: 'Dạo Phố' },
+    gala:    { id: 'gala',    label: 'Dạ Tiệc' }
+  };
+
+  // Phương án A: IMM (2 câu) + FLO (3 câu) + ATT1 (Bẫy chú ý)
+  const QUESTIONS = [
+    { code: "IMM1", construct: "Sự đắm chìm (Immersion • Li, 2025)", text: "Trong quá trình trải nghiệm, tôi luôn giữ được sự tập trung.", isTrap: false },
+    { code: "IMM2", construct: "Sự đắm chìm (Immersion • Li, 2025)", text: "Tâm trí tôi thường đắm chìm vào trải nghiệm.", isTrap: false },
+    { code: "FLO1", construct: "Trải nghiệm dòng chảy (Flow • Novak et al., 2000)", text: "Tôi cảm thấy như mình đang ở trong một trạng thái trôi chảy (flow).", isTrap: false },
+    { code: "ATT1", construct: "Kiểm tra sự chú ý (Attention Check)", text: "Để đảm bảo bạn đang đọc kỹ câu hỏi, vui lòng kéo thanh trượt về đúng mức 2.", isTrap: true, expected: 2 },
+    { code: "FLO2", construct: "Trải nghiệm dòng chảy (Flow • Li & Sun, 2025)", text: "Tôi hoàn toàn quên mất khái niệm thời gian.", isTrap: false },
+    { code: "FLO3", construct: "Trải nghiệm dòng chảy (Flow • Li & Sun, 2025)", text: "Tôi hoàn toàn bị cuốn hút vào hoạt động này.", isTrap: false }
+  ];
+
+  const LIKERT_LABELS = {
+    1: "1 • Hoàn toàn không đồng ý", 2: "2 • Không đồng ý", 3: "3 • Hơi không đồng ý",
+    4: "4 • Trung lập", 5: "5 • Hơi đồng ý", 6: "6 • Đồng ý", 7: "7 • Hoàn toàn đồng ý"
+  };
+
+  // ==================== 2. SESSION & VIDEO STATE ====================
+  const session = {
+    sessionId: "GZ-" + Math.floor(1000 + Math.random() * 9000),
+    respondentName: "",
+    group: Math.random() < 0.5 ? "A" : "B",
+    startedAt: Date.now(),
+    videoStartTs: 0,
+    videoDurationMs: 0,
+    interactionCount: 0,
+    clickSequence: [],
+    touchPoints: [], // {x, y, zone}
+    zoneCounts: { outfit: 0, scene: 0, cta: 0, zoom: 0, character: 0 },
+    ctaClicked: false,
+    timeToFirstCtaMs: null,
+    tabSwitchCount: 0,
+    items: {},
+    device: {
+      ua: /iPhone|iPad/i.test(navigator.userAgent) ? "iOS" : (/Android/i.test(navigator.userAgent) ? "Android" : "Desktop"),
+      viewport: window.innerWidth + "x" + window.innerHeight
+    }
+  };
+
+  const state = {
+    outfit: 'pajama', scene: 'bedroom', bpm: 110, startTime: performance.now(),
+    transitionFlash: 0, particles: [],
+    zoom: 1, targetZoom: 1, panX: 0, panY: 0, targetPanX: 0, targetPanY: 0,
+    isDragging: false, isPinching: false, dragStartX: 0, dragStartY: 0,
+    initialPinchDist: null, initialPinchZoom: 1, lastPinchMidX: 0, lastPinchMidY: 0
+  };
+
+  let animFrameId = null, watchInterval = null, linearInterval = null;
+  let currentQIdx = 0, qStartTs = 0, sliderTouched = false;
+  let qDragCount = 0, qReversals = 0, qLastDir = 0, qPrevVal = 4, qTrace = [];
+
+  document.addEventListener("visibilitychange", () => { if (document.hidden) session.tabSwitchCount++; });
+
+  // ==================== 3. AUDIO ENGINE (./music.mp3 + Chime) ====================
+  const audioEl = document.getElementById("bgMusic");
+  let isAudioPlaying = false;
+  let audioCtx = null;
+
+  function startAudio() {
+    if (!audioEl) return;
+    audioEl.volume = 0.22;
+    audioEl.play().then(() => {
+      isAudioPlaying = true;
+      document.getElementById("audioBtnText").textContent = "🔊 Nhạc";
+    }).catch(() => {
+      isAudioPlaying = false;
+      document.getElementById("audioBtnText").textContent = "🔇 Tắt";
+    });
+  }
+  function stopAudio() {
+    if (audioEl && !audioEl.paused) audioEl.pause();
+    isAudioPlaying = false;
+    document.getElementById("audioBtnText").textContent = "🔇 Tắt";
+  }
+  function playChime() {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const now = audioCtx.currentTime;
+      [880, 1108.73, 1318.51].forEach((f, i) => {
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = 'sine'; osc.frequency.setValueAtTime(f, now + i * 0.04);
+        g.gain.setValueAtTime(0.04, now + i * 0.04);
+        g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.04 + 0.25);
+        osc.connect(g); g.connect(audioCtx.destination);
+        osc.start(now + i * 0.04); osc.stop(now + i * 0.04 + 0.26);
+      });
+    } catch (e) {}
+  }
+
+  document.getElementById("audioToggleBtn").addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (isAudioPlaying) stopAudio(); else startAudio();
+  });
+
+  // ==================== 4. GROUP & SCREEN NAVIGATION ====================
+  function updateGroupBadge() {
+    const b = document.getElementById("groupBadge");
+    b.textContent = session.group === "A" ? "Nhóm A • Tương tác" : "Nhóm B • Tuyến tính";
+    b.style.background = session.group === "A" ? "rgba(56, 169, 208, 0.25)" : "rgba(217, 93, 57, 0.35)";
+  }
+  updateGroupBadge();
+
+  function cycleGroupForDemo() {
+    if (document.getElementById("screenWelcome").classList.contains("active")) {
+      session.group = session.group === "A" ? "B" : "A";
+      updateGroupBadge();
+    }
+  }
+
+  function showScreen(id, progressPct) {
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+    document.getElementById("progressFill").style.width = progressPct + "%";
+  }
+
+  // ==================== 5. EXACT TOUCH HEATMAP CAPTURE ====================
+  const stageArea = document.getElementById("videoStageArea");
+  stageArea.addEventListener("pointerdown", (e) => {
+    const rect = stageArea.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const xPct = Math.max(0, Math.min(100, Math.round(((e.clientX - rect.left) / rect.width) * 1000) / 10));
+    const yPct = Math.max(0, Math.min(100, Math.round(((e.clientY - rect.top) / rect.height) * 1000) / 10));
+
+    // Xác định chính xác vùng ngữ nghĩa người dùng chạm
+    let zone = "character";
+    const t = e.target;
+    if (t.closest("#checkoutBtn") || t.closest("#vpePopup")) zone = "cta";
+    else if (t.closest(".outfit-btn") || t.closest("#resetPajamaBtn")) zone = "outfit";
+    else if (t.closest(".scene-btn")) zone = "scene";
+    else if (t.closest("#zoomDock")) zone = "zoom";
+
+    session.touchPoints.push({ x: xPct, y: yPct, zone });
+    if (session.zoneCounts[zone] !== undefined) session.zoneCounts[zone]++;
+
+    const rip = document.createElement("div");
+    rip.className = "touch-ripple";
+    rip.style.left = xPct + "%";
+    rip.style.top = yPct + "%";
+    stageArea.appendChild(rip);
+    setTimeout(() => rip.remove(), 500);
+  }, true); // Capture phase: luôn bắt được 100% điểm chạm dù nút có xử lý click riêng
+
+  // ==================== 6. START VIDEO STAGE ====================
+  const canvas = document.getElementById("stageCanvas");
+  const ctx = canvas.getContext("2d");
+
+  function resizeCanvas() {
+    const rect = stageArea.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  window.addEventListener("resize", resizeCanvas);
+
+  function startVideoStage() {
+    const nameInput = document.getElementById("respondentName").value.trim();
+    session.respondentName = nameInput || ("GenZ #" + session.sessionId.slice(-3));
+    session.videoStartTs = Date.now();
+    state.startTime = performance.now();
+
+    document.getElementById("groupBadge").style.display = "none";
+    document.getElementById("toSurveyTopBtn").style.display = "inline-block";
+    document.getElementById("topBrandText").textContent = session.group === "A" ? "NHÓM A • TƯƠNG TÁC" : "NHÓM B • TUYẾN TÍNH";
+
+    if (session.group === "A") {
+      document.getElementById("interactiveDock").style.display = "flex";
+      document.getElementById("zoomDock").style.display = "flex";
+      document.getElementById("linearBar").style.display = "none";
+    } else {
+      document.getElementById("interactiveDock").style.display = "none";
+      document.getElementById("zoomDock").style.display = "none";
+      document.getElementById("linearBar").style.display = "block";
+      const seq = [
+        { o: 'cream', s: 'beach' },
+        { o: 'tweed', s: 'cafe' },
+        { o: 'red',   s: 'gala' }
+      ];
+      let idx = 0;
+      linearInterval = setInterval(() => {
+        const cur = seq[idx % seq.length];
+        state.outfit = cur.o;
+        state.scene = cur.s;
+        spawnParticles(OUTFIT_DATA[cur.o].accent);
+        updateContextLabel();
+        idx++;
+      }, 2800);
+    }
+
+    showScreen("screenVideo", 25);
+    requestAnimationFrame(() => {
+      resizeCanvas();
+      startAudio();
+      animFrameId = requestAnimationFrame(animate);
+    });
+
+    watchInterval = setInterval(() => {
+      const sec = ((Date.now() - session.videoStartTs) / 1000).toFixed(1);
+      document.getElementById("watchTimer").textContent = sec + "s";
+    }, 100);
+  }
+
+  // ==================== 7. REAL INTERACTIVE VIDEO CONTROLS ====================
+  const vpePopup = document.getElementById("vpePopup");
+  const topStatusBar = document.getElementById("topStatusBar");
+  const orderToast = document.getElementById("orderToast");
+  let toastTimer = null;
+
+  function updateContextLabel() {
+    document.getElementById("currentContextLabel").textContent =
+      `${SCENE_DATA[state.scene].label} • ${OUTFIT_DATA[state.outfit].shortName}`;
+  }
+
+  function showVpePopup(key) {
+    const d = OUTFIT_DATA[key];
+    if (!d || key === 'pajama') { hideVpePopup(); return; }
+    document.getElementById("vpeThumb").textContent = d.emoji;
+    document.getElementById("vpeDiscountBadge").textContent = d.discount;
+    document.getElementById("vpeTitle").textContent = d.title;
+    document.getElementById("vpeSalePrice").textContent = d.salePrice;
+    document.getElementById("vpeOrigPrice").textContent = d.origPrice;
+    vpePopup.classList.add("is-visible");
+    topStatusBar.style.opacity = "0";
+    topStatusBar.style.pointerEvents = "none";
+  }
+
+  function hideVpePopup() {
+    vpePopup.classList.remove("is-visible");
+    topStatusBar.style.opacity = "1";
+    topStatusBar.style.pointerEvents = "auto";
+  }
+
+  function selectOutfit(key) {
+    playChime();
+    state.outfit = key;
+    session.interactionCount++;
+    session.clickSequence.push("Đồ: " + OUTFIT_DATA[key].shortName);
+    if (key !== 'pajama' && state.scene === 'bedroom') {
+      state.scene = 'cafe';
+      document.querySelectorAll(".scene-btn").forEach(b => b.classList.toggle("active-scene", b.dataset.scene === 'cafe'));
+    }
+    document.querySelectorAll(".outfit-btn").forEach(b => b.classList.toggle("active-outfit", b.dataset.outfit === key));
+    spawnParticles(OUTFIT_DATA[key].accent);
+    updateContextLabel();
+    if (key === 'pajama') hideVpePopup(); else showVpePopup(key);
+  }
+
+  function selectScene(key) {
+    playChime();
+    state.scene = key;
+    session.interactionCount++;
+    session.clickSequence.push("Cảnh: " + SCENE_DATA[key].label);
+    document.querySelectorAll(".scene-btn").forEach(b => b.classList.toggle("active-scene", b.dataset.scene === key));
+    const colors = { beach: '#38bdf8', cafe: '#fb7185', gala: '#fbbf24', bedroom: '#a7f3d0' };
+    spawnParticles(colors[key] || '#fbbf24');
+    updateContextLabel();
+  }
+
+  document.querySelectorAll(".outfit-btn").forEach(btn => btn.addEventListener("click", () => selectOutfit(btn.dataset.outfit)));
+  document.querySelectorAll(".scene-btn").forEach(btn => btn.addEventListener("click", () => selectScene(btn.dataset.scene)));
+  document.getElementById("resetPajamaBtn").addEventListener("click", () => { state.scene = 'bedroom'; selectOutfit('pajama'); });
+  document.getElementById("closeVpeBtn").addEventListener("click", hideVpePopup);
+
+  document.getElementById("checkoutBtn").addEventListener("click", () => {
+    playChime();
+    if (!session.ctaClicked) {
+      session.ctaClicked = true;
+      session.timeToFirstCtaMs = Date.now() - session.videoStartTs;
+    }
+    session.interactionCount++;
+    session.clickSequence.push("+Chốt đơn (" + OUTFIT_DATA[state.outfit].shortName + ")");
+    document.getElementById("orderToastDetail").textContent = `Giữ ưu đãi ${OUTFIT_DATA[state.outfit].salePrice} thành công`;
+    orderToast.classList.add("is-visible");
+    spawnParticles("#10b981");
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => orderToast.classList.remove("is-visible"), 2200);
+  });
+
+  // Zoom Slider & Gestures
+  const zoomSlider = document.getElementById("zoomSlider");
+  const zoomLevelText = document.getElementById("zoomLevelText");
+  function clampPan() {
+    const rect = stageArea.getBoundingClientRect();
+    const mx = rect.width * (state.targetZoom - 1) * 0.52;
+    const my = rect.height * (state.targetZoom - 1) * 0.52;
+    state.targetPanX = Math.max(-mx, Math.min(mx, state.targetPanX));
+    state.targetPanY = Math.max(-my, Math.min(my, state.targetPanY));
+  }
+  zoomSlider.addEventListener("input", () => {
+    state.targetZoom = parseFloat(zoomSlider.value);
+    if (state.targetZoom <= 1.02) { state.targetZoom = 1; state.targetPanX = 0; state.targetPanY = 0; }
+    else clampPan();
+    zoomLevelText.textContent = state.targetZoom.toFixed(1) + "x";
+  });
+
+  // ==================== 8. CANVAS RENDERING (FROM USER'S index.html) ====================
+  function spawnParticles(color = '#f43f5e') {
+    const rect = stageArea.getBoundingClientRect();
+    const cx = rect.width * 0.5, cy = rect.height * 0.44;
+    state.transitionFlash = 0.85;
+    for (let i = 0; i < 24; i++) {
+      const a = (Math.PI * 2 * i) / 24 + (Math.random() - 0.5) * 0.3;
+      const sp = 1.6 + Math.random() * 4.2;
+      state.particles.push({
+        x: cx + (Math.random() - 0.5) * 60, y: cy + (Math.random() - 0.5) * 110,
+        vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 1.1,
+        size: 3 + Math.random() * 4.5, alpha: 1,
+        color: i % 3 === 0 ? '#fde047' : (i % 3 === 1 ? '#ffffff' : color)
+      });
+    }
+  }
+
+  function drawBedroomScene(w, h, walkPhase) {
+    const vpX = w * 0.5, vpY = h * 0.42;
+    const wallGrad = ctx.createLinearGradient(0, 0, 0, vpY + 40);
+    wallGrad.addColorStop(0, '#fff7ed'); wallGrad.addColorStop(1, '#fdeee7');
+    ctx.fillStyle = wallGrad; ctx.fillRect(0, 0, w, vpY + 40);
+    ctx.fillStyle = '#f8e5da';
+    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(vpX - 45, vpY - 35); ctx.lineTo(vpX - 45, vpY + 25); ctx.lineTo(0, h * 0.64); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(w, 0); ctx.lineTo(vpX + 45, vpY - 35); ctx.lineTo(vpX + 45, vpY + 25); ctx.lineTo(w, h * 0.64); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#e0f2fe';
+    ctx.beginPath(); ctx.moveTo(w * 0.05, h * 0.14); ctx.lineTo(w * 0.28, h * 0.24); ctx.lineTo(w * 0.28, h * 0.50); ctx.lineTo(w * 0.05, h * 0.54); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.stroke();
+    const floorGrad = ctx.createLinearGradient(0, vpY + 20, 0, h);
+    floorGrad.addColorStop(0, '#ebd3bd'); floorGrad.addColorStop(1, '#dcbfa3');
+    ctx.fillStyle = floorGrad; ctx.fillRect(0, vpY + 20, w, h - vpY);
+    ctx.strokeStyle = 'rgba(168,126,94,0.25)'; ctx.lineWidth = 1.4;
+    for (let i = -4; i <= 4; i++) { ctx.beginPath(); ctx.moveTo(vpX + i * 14, vpY + 20); ctx.lineTo(vpX + i * 95, h); ctx.stroke(); }
+    const scroll = 1 - (walkPhase % 1);
+    for (let i = 0; i < 7; i++) {
+      const t = Math.pow((i + scroll) / 7, 1.8);
+      const y = vpY + 20 + t * (h - vpY - 20);
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+    }
+  }
+
+  function drawBeachScene(w, h, walkPhase) {
+    const vpX = w * 0.42, vpY = h * 0.41;
+    const sky = ctx.createLinearGradient(0, 0, 0, vpY);
+    sky.addColorStop(0, '#0ea5e9'); sky.addColorStop(0.6, '#7dd3fc'); sky.addColorStop(1, '#fef9c3');
+    ctx.fillStyle = sky; ctx.fillRect(0, 0, w, vpY + 2);
+    const sea = ctx.createLinearGradient(0, vpY, w * 0.5, h);
+    sea.addColorStop(0, '#0284c7'); sea.addColorStop(1, '#22d3ee');
+    ctx.fillStyle = sea; ctx.beginPath(); ctx.moveTo(0, vpY); ctx.lineTo(vpX, vpY); ctx.lineTo(w * 0.22, h); ctx.lineTo(0, h); ctx.closePath(); ctx.fill();
+    const sand = ctx.createLinearGradient(vpX, vpY, w, h);
+    sand.addColorStop(0, '#fef08a'); sand.addColorStop(1, '#f59e0b');
+    ctx.fillStyle = sand; ctx.beginPath(); ctx.moveTo(vpX, vpY); ctx.lineTo(w, vpY); ctx.lineTo(w, h); ctx.lineTo(w * 0.22, h); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.moveTo(vpX, vpY); ctx.lineTo(w * 0.22 + Math.sin(walkPhase * Math.PI) * 8, h); ctx.stroke();
+    const scroll = 1 - (walkPhase % 1);
+    for (let i = 0; i < 4; i++) {
+      const t = Math.pow((i + scroll) / 4, 2.1);
+      const ox = (vpX + 34) + t * (w * 0.96 - (vpX + 34));
+      const oy = vpY + t * (h * 0.78 - vpY);
+      const sc = 0.14 + t * 1.05;
+      ctx.save(); ctx.translate(ox, oy); ctx.scale(sc, sc);
+      ctx.strokeStyle = '#92400e'; ctx.lineWidth = 7;
+      ctx.beginPath(); ctx.moveTo(0, 0); ctx.quadraticCurveTo(-8, -60, 6, -115); ctx.stroke();
+      ctx.fillStyle = '#16a34a';
+      for (let f = 0; f < 5; f++) {
+        ctx.save(); ctx.translate(6, -115); ctx.rotate(-0.7 + f * 0.38);
+        ctx.beginPath(); ctx.ellipse(24, 0, 26, 7, 0.15, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+      }
+      ctx.restore();
+    }
+  }
+
+  function drawCafeScene(w, h, walkPhase) {
+    const vpX = w * 0.5, vpY = h * 0.42, scroll = 1 - (walkPhase % 1);
+    const sky = ctx.createLinearGradient(0, 0, 0, vpY);
+    sky.addColorStop(0, '#bae6fd'); sky.addColorStop(1, '#fef3c7');
+    ctx.fillStyle = sky; ctx.fillRect(0, 0, w, vpY + 5);
+    ctx.fillStyle = '#fde68a'; ctx.fillRect(vpX - 38, vpY - 52, 76, 56);
+    ctx.fillStyle = '#fff7ed';
+    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(vpX - 38, vpY - 52); ctx.lineTo(vpX - 38, vpY + 4); ctx.lineTo(0, h * 0.70); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#ffe4e6';
+    ctx.beginPath(); ctx.moveTo(w, 0); ctx.lineTo(vpX + 38, vpY - 52); ctx.lineTo(vpX + 38, vpY + 4); ctx.lineTo(w, h * 0.70); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#e7e5e4';
+    ctx.beginPath(); ctx.moveTo(0, h * 0.70); ctx.lineTo(vpX - 38, vpY + 4); ctx.lineTo(vpX + 38, vpY + 4); ctx.lineTo(w, h * 0.70); ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.closePath(); ctx.fill();
+    for (let i = 0; i < 4; i++) {
+      const t = Math.pow((i + scroll) / 4, 2.0);
+      const archY = (vpY - 44) + t * (h * 0.08 - (vpY - 44));
+      const lx = (vpX - 38) + t * (0 - (vpX - 38));
+      const rx = (vpX + 38) + t * (w - (vpX + 38));
+      ctx.strokeStyle = `rgba(22,101,52,${0.35 + t * 0.5})`; ctx.lineWidth = 1.5 + t * 2;
+      ctx.beginPath(); ctx.moveTo(lx, archY); ctx.quadraticCurveTo(vpX, archY + 12 + t * 25, rx, archY); ctx.stroke();
+      for (let b = 1; b <= 4; b++) {
+        const bt = b / 5;
+        ctx.fillStyle = b % 2 === 0 ? '#fef08a' : '#fb7185';
+        ctx.beginPath(); ctx.arc(lx + (rx - lx) * bt, archY + Math.sin(bt * Math.PI) * (12 + t * 25), 2 + t * 3, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+  }
+
+  function drawGalaScene(w, h, walkPhase) {
+    const vpX = w * 0.5, vpY = h * 0.42, scroll = 1 - (walkPhase % 1);
+    const bg = ctx.createLinearGradient(0, 0, 0, h);
+    bg.addColorStop(0, '#1e1b4b'); bg.addColorStop(0.5, '#4a0e2e'); bg.addColorStop(1, '#270917');
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, w, h);
+    const glow = ctx.createRadialGradient(vpX, vpY - 20, 8, vpX, vpY, w * 0.65);
+    glow.addColorStop(0, 'rgba(254,240,138,0.72)'); glow.addColorStop(1, 'rgba(251,191,36,0)');
+    ctx.fillStyle = glow; ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = '#be123c';
+    ctx.beginPath(); ctx.moveTo(vpX - 24, vpY + 6); ctx.lineTo(vpX + 24, vpY + 6); ctx.lineTo(w * 0.84, h); ctx.lineTo(w * 0.16, h); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = '#fde047'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(vpX - 24, vpY + 6); ctx.lineTo(w * 0.16, h); ctx.moveTo(vpX + 24, vpY + 6); ctx.lineTo(w * 0.84, h); ctx.stroke();
+    for (let i = 0; i < 4; i++) {
+      const t = Math.pow((i + scroll) / 4, 2.05);
+      const yp = (vpY + 6) + t * (h * 0.90 - (vpY + 6));
+      const lc = (vpX - 26) + t * (w * 0.12 - (vpX - 26));
+      const rc = (vpX + 26) + t * (w * 0.88 - (vpX + 26));
+      const sc = 0.16 + t * 1.05;
+      ctx.fillStyle = `rgba(253,224,71,${0.25 + t * 0.5})`;
+      ctx.beginPath(); ctx.arc(lc - 22 * sc, yp - 32 * sc, 4 * sc, 0, Math.PI * 2); ctx.arc(rc + 22 * sc, yp - 32 * sc, 4 * sc, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+
+  function drawFashionCharacter(w, h, beatPhase, elapsedSec) {
+    const scene = state.scene, outfit = state.outfit;
+    const stepAngle = beatPhase * Math.PI;
+    const stride = Math.sin(stepAngle);
+    const doubleBounce = Math.abs(Math.cos(stepAngle));
+    const hipX = stride * (scene === 'gala' ? 9 : 7.5);
+    const bodyBobY = -doubleBounce * 6;
+    const torsoTilt = stride * 0.042;
+    const headTilt = -stride * 0.032;
+
+    const scaleFactor = Math.min(w / 390, h / 740) * 0.96;
+    ctx.save();
+    ctx.translate(w * 0.5 + hipX, h * 0.67);
+    ctx.scale(scaleFactor, scaleFactor);
+
+    ctx.fillStyle = 'rgba(30,20,25,0.18)';
+    ctx.beginPath(); ctx.ellipse(0, 5, 42 - doubleBounce * 4, 8, 0, 0, Math.PI * 2); ctx.fill();
+
+    const skin = '#fde2d2';
+    const drawLeg = (sx, sv) => {
+      const lift = sv > 0 ? -Math.sin(sv * Math.PI) * 9 : sv * 6;
+      ctx.save(); ctx.translate(sx, -135 + bodyBobY * 0.7); ctx.rotate(-sv * 0.05);
+      ctx.fillStyle = skin; ctx.beginPath(); ctx.roundRect(-8, 0, 16, 124 + lift, 8); ctx.fill();
+      ctx.fillStyle = outfit === 'red' ? '#18181b' : (outfit === 'pajama' ? '#bae6fd' : '#f3d5b5');
+      ctx.beginPath(); ctx.roundRect(-7, 120 + lift, 14, 11, 4); ctx.fill();
+      ctx.restore();
+    };
+    if (stride < -stride) { drawLeg(-14, stride); drawLeg(14, -stride); }
+    else { drawLeg(14, -stride); drawLeg(-14, stride); }
+
+    // Back hair
+    ctx.save(); ctx.translate(0, -245 + bodyBobY); ctx.fillStyle = '#241816';
+    if (scene === 'beach') {
+      ctx.beginPath(); ctx.arc(0, -48, 14, 0, Math.PI * 2); ctx.arc(0, -22, 24, 0, Math.PI * 2); ctx.fill();
+    } else if (scene === 'gala') {
+      ctx.beginPath(); ctx.moveTo(-24, -28); ctx.bezierCurveTo(-40, 12, -34 + stride * 6, 50, -26 + stride * 8, 82);
+      ctx.lineTo(26 + stride * 8, 82); ctx.bezierCurveTo(34 + stride * 6, 50, 40, 12, 24, -28); ctx.closePath(); ctx.fill();
+    } else {
+      ctx.beginPath(); ctx.moveTo(-24, -28); ctx.quadraticCurveTo(-32 + stride * 3, 14, -24 + stride * 4, 38);
+      ctx.lineTo(24 + stride * 4, 38); ctx.quadraticCurveTo(32 + stride * 3, 14, 24, -28); ctx.closePath(); ctx.fill();
+    }
+    ctx.restore();
+
+    // Torso + Outfit
+    ctx.save(); ctx.translate(0, -142 + bodyBobY); ctx.rotate(torsoTilt);
+    ctx.fillStyle = skin; ctx.fillRect(-7, -118, 14, 22);
+    ctx.beginPath(); ctx.moveTo(-24, -96); ctx.quadraticCurveTo(0, -102, 24, -96); ctx.lineTo(18, -46); ctx.lineTo(22, 4); ctx.lineTo(-22, 4); ctx.lineTo(-18, -46); ctx.closePath(); ctx.fill();
+
+    const sf = stride * 5;
+    if (outfit === 'pajama') {
+      ctx.fillStyle = '#e0f2fe'; ctx.beginPath(); ctx.roundRect(-22, -94, 44, 54, 8); ctx.fill();
+      ctx.fillStyle = '#bae6fd'; ctx.beginPath(); ctx.roundRect(-22, -42, 44, 34, 6); ctx.fill();
+    } else if (outfit === 'cream') {
+      const g = ctx.createLinearGradient(-25, -80, 25, 85);
+      g.addColorStop(0, '#fffbeb'); g.addColorStop(1, '#fde68a'); ctx.fillStyle = g;
+      ctx.beginPath(); ctx.moveTo(-19, -78); ctx.lineTo(19, -78); ctx.lineTo(16, -44);
+      ctx.quadraticCurveTo(34 + sf, 22, 38 + sf * 1.4, 80); ctx.lineTo(-38 + sf * 1.4, 80);
+      ctx.quadraticCurveTo(-34 + sf, 22, -16, -44); ctx.closePath(); ctx.fill();
+    } else if (outfit === 'tweed') {
+      ctx.fillStyle = '#fff'; ctx.fillRect(-15, -88, 30, 42);
+      ctx.fillStyle = '#fbcfe8'; ctx.beginPath(); ctx.roundRect(-23, -95, 18, 46, 5); ctx.roundRect(5, -95, 18, 46, 5); ctx.fill();
+      ctx.fillStyle = '#fff1f2'; ctx.beginPath(); ctx.moveTo(-18, -46); ctx.lineTo(18, -46); ctx.lineTo(32 + sf, 14); ctx.lineTo(-32 + sf, 14); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#be185d'; ctx.fillRect(-18, -47, 36, 5);
+    } else if (outfit === 'red') {
+      const g = ctx.createLinearGradient(-22, -82, 22, 95);
+      g.addColorStop(0, '#be123c'); g.addColorStop(1, '#881337'); ctx.fillStyle = g;
+      ctx.beginPath(); ctx.moveTo(-21, -80); ctx.quadraticCurveTo(0, -76, 21, -80); ctx.lineTo(16, -44);
+      ctx.quadraticCurveTo(24, 10, 22, 54); ctx.lineTo(31 + sf, 90); ctx.lineTo(-31 + sf, 90);
+      ctx.lineTo(-22, 54); ctx.quadraticCurveTo(-24, 10, -16, -44); ctx.closePath(); ctx.fill();
+    }
+
+    // Arms
+    [-1, 1].forEach(dir => {
+      ctx.save(); ctx.translate(dir * 25, -90); ctx.rotate(dir * 0.22 - stride * 0.32);
+      ctx.fillStyle = skin; ctx.beginPath(); ctx.roundRect(-5, 0, 10, 74, 5); ctx.fill();
+      if (outfit === 'tweed') { ctx.fillStyle = '#fbcfe8'; ctx.beginPath(); ctx.roundRect(-6.5, -2, 13, 38, 5); ctx.fill(); }
+      ctx.restore();
+    });
+
+    // Head
+    ctx.save(); ctx.translate(0, -118); ctx.rotate(headTilt);
+    ctx.fillStyle = skin;
+    ctx.beginPath(); ctx.moveTo(-22, -34); ctx.quadraticCurveTo(-24, -8, 0, 0); ctx.quadraticCurveTo(24, -8, 22, -34); ctx.quadraticCurveTo(22, -56, 0, -56); ctx.quadraticCurveTo(-22, -56, -22, -34); ctx.fill();
+    const isBlinking = (elapsedSec % 3.4) > 3.25;
+    [-9.5, 9.5].forEach(ex => {
+      if (isBlinking) { ctx.strokeStyle = '#3f2e2b'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(ex, -25, 4, 0.1 * Math.PI, 0.9 * Math.PI); ctx.stroke(); }
+      else { ctx.fillStyle = '#2b1d1a'; ctx.beginPath(); ctx.ellipse(ex, -25, 3.2, 4, 0, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(ex - 1, -26.5, 1.2, 0, Math.PI * 2); ctx.fill(); }
+    });
+    ctx.fillStyle = scene === 'gala' ? '#9f1239' : '#f43f5e';
+    ctx.beginPath(); ctx.arc(0, -13, 5.5, 0.08 * Math.PI, 0.92 * Math.PI); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#241816';
+    ctx.beginPath(); ctx.moveTo(-22, -32); ctx.quadraticCurveTo(-22, -58, 0, -58); ctx.quadraticCurveTo(22, -58, 22, -32); ctx.quadraticCurveTo(10, -48, 0, -43); ctx.quadraticCurveTo(-12, -48, -22, -32); ctx.fill();
+    ctx.restore();
+
+    ctx.restore();
+    ctx.restore();
+  }
+
+  function animate(now) {
+    const rect = stageArea.getBoundingClientRect();
+    const w = rect.width, h = rect.height;
+    const elapsedSec = (now - state.startTime) / 1000;
+    const beatPhase = elapsedSec * (state.bpm / 60);
+    const walkPhase = beatPhase * 0.55;
+
+    state.zoom += (state.targetZoom - state.zoom) * 0.22;
+    state.panX += (state.targetPanX - state.panX) * 0.22;
+    state.panY += (state.targetPanY - state.panY) * 0.22;
+
+    ctx.clearRect(0, 0, w, h);
+    ctx.save();
+    ctx.translate(w * 0.5 + state.panX, h * 0.44 + state.panY);
+    ctx.scale(state.zoom, state.zoom);
+    ctx.translate(-w * 0.5, -h * 0.44);
+
+    if (state.scene === 'bedroom') drawBedroomScene(w, h, walkPhase);
+    else if (state.scene === 'beach') drawBeachScene(w, h, walkPhase);
+    else if (state.scene === 'cafe') drawCafeScene(w, h, walkPhase);
+    else drawGalaScene(w, h, walkPhase);
+
+    drawFashionCharacter(w, h, beatPhase, elapsedSec);
+    ctx.restore();
+
+    for (let i = state.particles.length - 1; i >= 0; i--) {
+      const p = state.particles[i];
+      p.x += p.vx; p.y += p.vy; p.vy += 0.06; p.alpha -= 0.028;
+      if (p.alpha <= 0) { state.particles.splice(i, 1); continue; }
+      ctx.save(); ctx.globalAlpha = p.alpha; ctx.fillStyle = p.color;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.size * 0.65, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+    }
+    if (state.transitionFlash > 0.01) {
+      ctx.fillStyle = `rgba(255,255,255,${state.transitionFlash * 0.3})`;
+      ctx.fillRect(0, 0, w, h);
+      state.transitionFlash *= 0.85;
+    }
+    animFrameId = requestAnimationFrame(animate);
+  }
+
+  // ==================== 9. SURVEY LOGIC (SLIDER PARADATA) ====================
+  function startSurvey() {
+    clearInterval(watchInterval);
+    clearInterval(linearInterval);
+    if (animFrameId) cancelAnimationFrame(animFrameId);
+    stopAudio();
+
+    session.videoDurationMs = Date.now() - session.videoStartTs;
+    document.getElementById("toSurveyTopBtn").style.display = "none";
+    document.getElementById("groupBadge").style.display = "inline-block";
+    document.getElementById("topBrandText").textContent = "KHẢO SÁT TỨC THỜI";
+
+    currentQIdx = 0;
+    showScreen("screenSurvey", 38);
+    loadQuestion(0);
+  }
+
+  const slider = document.getElementById("likertSlider");
+  slider.addEventListener("input", () => {
+    const val = parseInt(slider.value, 10);
+    sliderTouched = true;
+    qDragCount++;
+    if (val !== qPrevVal) {
+      const dir = val > qPrevVal ? 1 : -1;
+      if (qLastDir !== 0 && dir !== qLastDir) qReversals++;
+      qLastDir = dir; qPrevVal = val;
+      if (qTrace[qTrace.length - 1] !== val) qTrace.push(val);
+    }
+    document.getElementById("sliderNum").textContent = val;
+    document.getElementById("sliderNum").style.background = "#00477D";
+    document.getElementById("sliderLabel").textContent = LIKERT_LABELS[val];
+  });
+
+  function loadQuestion(idx) {
+    const q = QUESTIONS[idx];
+    qStartTs = Date.now();
+    sliderTouched = false; qDragCount = 0; qReversals = 0; qLastDir = 0; qPrevVal = 4; qTrace = [4];
+
+    const badge = document.getElementById("qCodeBadge");
+    badge.textContent = q.code;
+    badge.className = "q-code" + (q.isTrap ? " trap" : "");
+    document.getElementById("qStepLabel").textContent = `Câu ${idx + 1} / ${QUESTIONS.length}`;
+    document.getElementById("qConstruct").textContent = q.construct;
+    document.getElementById("qText").textContent = q.text;
+
+    slider.value = 4;
+    document.getElementById("sliderNum").textContent = "4";
+    document.getElementById("sliderNum").style.background = "#001E40";
+    document.getElementById("sliderLabel").textContent = "Chạm hoặc kéo thanh trượt (1 – 7)";
+
+    document.getElementById("progressFill").style.width = (38 + Math.round(((idx + 1) / QUESTIONS.length) * 52)) + "%";
+    document.getElementById("nextQBtn").textContent = (idx === QUESTIONS.length - 1) ? "Hoàn tất & Gửi dữ liệu ✓" : "Câu tiếp theo →";
+  }
+
+  function nextQuestion() {
+    const q = QUESTIONS[currentQIdx];
+    session.items[q.code] = {
+      value: parseInt(slider.value, 10),
+      rtMs: Date.now() - qStartTs,
+      dragCount: qDragCount,
+      reversals: qReversals,
+      touched: sliderTouched,
+      trace: qTrace
+    };
+    if (currentQIdx < QUESTIONS.length - 1) {
+      currentQIdx++;
+      loadQuestion(currentQIdx);
+    } else {
+      finalizeAndSubmit();
+    }
+  }
+
+  function finalizeAndSubmit() {
+    const totalSessionMs = Date.now() - session.startedAt;
+    const scaleCodes = ["IMM1", "IMM2", "FLO1", "FLO2", "FLO3"];
+    const scaleVals = scaleCodes.map(c => session.items[c].value);
+    const mean = scaleVals.reduce((a, b) => a + b, 0) / scaleVals.length;
+    const sd = Math.round(Math.sqrt(scaleVals.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / scaleVals.length) * 100) / 100;
+
+    const allCodes = QUESTIONS.map(q => q.code);
+    const rts = allCodes.map(c => session.items[c].rtMs);
+    const avgRtMs = Math.round(rts.reduce((a, b) => a + b, 0) / rts.length);
+    const fastItems = allCodes.filter(c => session.items[c].rtMs < 1500);
+    const totalHesitations = allCodes.reduce((a, c) => a + session.items[c].reversals, 0);
+    const attPass = session.items["ATT1"].value === 2;
+
+    const reasons = [];
+    if (!attPass) reasons.push("Sai bẫy chú ý (ATT1 ≠ 2)");
+    if (sd === 0) reasons.push("Đánh 1 đường thẳng (SD = 0)");
+    if (fastItems.length >= 2 || avgRtMs < 1600) reasons.push(`Trả lời quá nhanh (${fastItems.length} câu < 1.5s)`);
+    if (session.tabSwitchCount > 0) reasons.push(`Chuyển tab ${session.tabSwitchCount} lần`);
+
+    let qualityStatus = "VALID";
+    if (!attPass || sd === 0 || fastItems.length >= 3) qualityStatus = "REJECTED";
+    else if (reasons.length > 0) qualityStatus = "FLAGGED";
+
+    const record = {
+      sessionId: session.sessionId,
+      respondentName: session.respondentName,
+      timestamp: new Date().toLocaleTimeString("vi-VN"),
+      isoTime: new Date().toISOString(),
+      group: session.group,
+      videoDurationMs: session.videoDurationMs,
+      interactionCount: session.interactionCount,
+      clickSequence: session.clickSequence,
+      touchPoints: session.touchPoints,
+      zoneCounts: session.zoneCounts,
+      ctaClicked: session.ctaClicked,
+      timeToFirstCtaMs: session.timeToFirstCtaMs,
+      tabSwitchCount: session.tabSwitchCount,
+      items: session.items,
+      avgRtMs: avgRtMs,
+      totalSessionMs: totalSessionMs,
+      straightLiningSD: sd,
+      totalHesitations: totalHesitations,
+      attentionPass: attPass,
+      qualityStatus: qualityStatus,
+      reasons: reasons,
+      device: session.device
+    };
+
+    try {
+      const existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+      existing.unshift(record);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(existing));
+      if (channel) channel.postMessage({ type: "NEW_RECORD", record });
+    } catch (err) {}
+
+    renderDoneSummary(record);
+    showScreen("screenDone", 100);
+
+    if (SCRIPT_URL && SCRIPT_URL.startsWith("http")) {
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(record)
+      }).then(() => {
+        const pill = document.getElementById("syncStatusPill");
+        pill.textContent = "✓ Đã đẩy dữ liệu lên Backend Live!";
+        pill.style.background = "#DCFCE7"; pill.style.color = "#15803D";
+      }).catch(() => {
+        const pill = document.getElementById("syncStatusPill");
+        pill.textContent = "⚠ Đã lưu cục bộ (kiểm tra kết nối mạng)";
+        pill.style.background = "#FEF3C7"; pill.style.color = "#B45309";
+      });
+    }
+  }
+
+  function renderDoneSummary(r) {
+    const st = r.qualityStatus === "VALID" ? "🟢 HỢP LỆ (VALID)" : (r.qualityStatus === "FLAGGED" ? "🟡 CẦN XEM XÉT" : "🔴 BỊ LOẠI TỰ ĐỘNG");
+    document.getElementById("summaryCard").innerHTML = `
+      <div class="sum-row"><span>Mã phiên:</span><span class="sum-val">${r.sessionId} (${r.respondentName})</span></div>
+      <div class="sum-row"><span>Phân nhóm:</span><span class="sum-val">Nhóm ${r.group} (${r.group === "A" ? "Tương tác" : "Tuyến tính"})</span></div>
+      <div class="sum-row"><span>Video / Điểm chạm:</span><span class="sum-val">${(r.videoDurationMs/1000).toFixed(1)}s (${r.touchPoints.length} chạm)</span></div>
+      <div class="sum-row"><span>Tốc độ TB / câu:</span><span class="sum-val">${(r.avgRtMs/1000).toFixed(2)}s</span></div>
+      <div class="sum-row"><span>Bẫy chú ý (ATT1=2):</span><span class="sum-val">${r.attentionPass ? "Đạt ✓" : "Không đạt ✕"}</span></div>
+      <div class="sum-row"><span>Độ lệch chuẩn (SD):</span><span class="sum-val">${r.straightLiningSD}</span></div>
+      <div class="sum-row" style="margin-top:6px;padding-top:6px;border-top:1px solid #E2E8F0;align-items:center;">
+        <span>Kiểm định chất lượng:</span>
+        <span class="status-badge status-${r.qualityStatus}">${st}</span>
+      </div>
+    `;
+  }
+</script>
+</body>
+</html>
